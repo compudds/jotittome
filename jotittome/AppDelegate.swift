@@ -7,15 +7,84 @@
 //
 
 import UIKit
+import Parse
+import Bolts
+//import PushNotificationManager
+
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, PushNotificationDelegate {
 
     var window: UIWindow?
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //Parse.setApplicationId("qckvk3HZYS8ovGdqG5oOr4fiCt8Ey0lIxwm1n86J", clientKey: "kLqIdAhBh48TSwryESMxHWJxBoOjBN1QJPMBTlwX")
+        
+        Parse.enableLocalDatastore()
+        
+        let parseConfiguration = ParseClientConfiguration(block: { (ParseMutableClientConfiguration) -> Void in
+            ParseMutableClientConfiguration.applicationId = "jotittome647stgr^YHBd"
+            ParseMutableClientConfiguration.clientKey = "gfdsdtTFB%%^%$U^JYJNDRDE$"
+            ParseMutableClientConfiguration.server = "https://jotittome-1.herokuapp.com/parse"
+        })
+        
+        Parse.initializeWithConfiguration(parseConfiguration)
+        
+        PushNotificationManager.pushManager().delegate = self
+        PushNotificationManager.pushManager().handlePushReceived(launchOptions)
+        PushNotificationManager.pushManager().sendAppOpen()
+        PushNotificationManager.pushManager().registerForPushNotifications()
+
+        
+        //PFUser.enableAutomaticUser()
+
+        //PFFacebookUtils.initializeFacebook()
+        
+       
+        //var pushSettings:UIUserNotificationSettings = UIUserNotificationSettings(forTypes: .Alert, categories: nil)
+        /*var pushSettings:UIUserNotificationSettings = UIUserNotificationSettings(forTypes: UIUserNotificationType.Badge | UIUserNotificationType.Sound | UIUserNotificationType.Alert, categories: nil)
+        application.registerUserNotificationSettings(pushSettings)
+        application.registerForRemoteNotifications()*/
+        
+        // Register for Push Notitications
+        if application.applicationState != UIApplicationState.Background {
+            // Track an app open here if we launch with a push, unless
+            // "content_available" was used to trigger a background push (introduced in iOS 7).
+            // In that case, we skip tracking here to avoid double counting the app-open.
+            
+            let preBackgroundPush = !application.respondsToSelector(Selector("backgroundRefreshStatus"))
+            let oldPushHandlerOnly = !self.respondsToSelector(#selector(UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)))
+            var pushPayload = false
+            if let options = launchOptions {
+                pushPayload = options[UIApplicationLaunchOptionsRemoteNotificationKey] != nil
+            }
+            if (preBackgroundPush || oldPushHandlerOnly || pushPayload) {
+                PFAnalytics.trackAppOpenedWithLaunchOptions(launchOptions)
+            }
+        }
+        if application.respondsToSelector(#selector(UIApplication.registerUserNotificationSettings(_:))) {
+            let userNotificationTypes: UIUserNotificationType = [UIUserNotificationType.Alert, UIUserNotificationType.Badge, UIUserNotificationType.Sound]
+            let settings = UIUserNotificationSettings(forTypes: userNotificationTypes, categories: nil)
+            application.registerUserNotificationSettings(settings)
+            application.registerForRemoteNotifications()
+        } else {
+            let types: UIUserNotificationType = [UIUserNotificationType.Badge, UIUserNotificationType.Alert, UIUserNotificationType.Sound]
+            application.registerForRemoteNotifications()   //registerForRemoteNotifications(types)
+            
+            //let types = UIRemoteNotificationType.Badge | UIRemoteNotificationType.Alert | UIRemoteNotificationType.Sound
+           // application.registerForRemoteNotificationTypes(types)
+        }
+        
+        // Swift
+        let types: UIUserNotificationType = [.Alert, .Badge, .Sound]
+        let settings = UIUserNotificationSettings(forTypes: types, categories: nil)
+        application.registerUserNotificationSettings(settings)
+        application.registerForRemoteNotifications()
+        
+        
         return true
     }
 
@@ -40,7 +109,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
+    
+    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+        let installation = PFInstallation.currentInstallation()
+        installation.setDeviceTokenFromData(deviceToken)
+        installation.saveInBackground()
+        
+        PushNotificationManager.pushManager().handlePushRegistration(deviceToken)
+    }
+    
+    func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
+        if error.code == 3010 {
+            print("Push notifications are not supported in the iOS Simulator.")
+        } else {
+            print("application:didFailToRegisterForRemoteNotificationsWithError: %@", error)
+        }
+        
+        PushNotificationManager.pushManager().handlePushRegistrationFailure(error)
+    }
+    
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+        PFPush.handlePush(userInfo)
+        if application.applicationState == UIApplicationState.Inactive {
+            PFAnalytics.trackAppOpenedWithRemoteNotificationPayload(userInfo)
+        }
+        
+        PushNotificationManager.pushManager().handlePushReceived(userInfo)
+    }
+    
+    func onPushAccepted(pushManager: PushNotificationManager!, withNotification pushNotification: [NSObject : AnyObject]!, onStart: Bool) {
+        print("Push notification accepted: \(pushNotification)");
+    }
+    
 
 }
 
