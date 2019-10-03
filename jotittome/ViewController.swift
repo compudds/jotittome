@@ -4,7 +4,7 @@
 //
 //  Created by Eric Cook on 3/25/15.
 //  Copyright (c) 2015 Better Search, LLC. All rights reserved.
-//
+///
 
 import UIKit
 import Parse
@@ -19,8 +19,8 @@ var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
 var selectedDate = String()
 var selectedTime = String()
 var strDate1 = String()
-var defaultDateTime = NSDate()
-var currentDate = NSDate()
+var defaultDateTime = Date()
+var currentDate = Date()
 var message = String()
 var ltzName = String()
 var emailActive = 0
@@ -54,22 +54,22 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     
     @IBOutlet var defaultTextLabel: UIButton!
     
-    @IBAction func settings(sender: AnyObject) {
+    @IBAction func settings(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("messageToSettings", sender: self)
+        self.performSegue(withIdentifier: "messageToSettings", sender: self)
         
     }
-    @IBAction func defaultEmail(sender: AnyObject) {
+    @IBAction func defaultEmail(_ sender: AnyObject) {
         
         if btnColor == "GreenEmail" {
             
-            defaultEmailLabel.setTitleColor(UIColor.greenColor(), forState: UIControlState.Normal)
+            defaultEmailLabel.setTitleColor(UIColor.green, for: UIControl.State())
             defaultEmailActive = 1
                         
         } else {
         
-            defaultEmailLabel.setTitleColor(UIColor.greenColor(), forState: UIControlState.Normal)
-            defaultEmailLabel.setTitleColor(UIColor.greenColor(), forState: UIControlState.Selected)
+            defaultEmailLabel.setTitleColor(UIColor.green, for: UIControl.State())
+            defaultEmailLabel.setTitleColor(UIColor.green, for: UIControl.State.selected)
             defaultEmailActive = 1
             emailAddressesSelected = parseUser + "," + emailAddressesSelected
             btnColor = "GreenEmail"
@@ -80,18 +80,18 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         
     }
    
-    @IBAction func defaultText(sender: AnyObject) {
+    @IBAction func defaultText(_ sender: AnyObject) {
         
         if btnColor == "GreenText" {
             
-            defaultTextLabel.setTitleColor(UIColor.greenColor(), forState: UIControlState.Normal)
+            defaultTextLabel.setTitleColor(UIColor.green, for: UIControl.State())
             defaultTextActive = 1
             
             
         } else {
             
-            defaultTextLabel.setTitleColor(UIColor.greenColor(), forState: UIControlState.Normal)
-            defaultTextLabel.setTitleColor(UIColor.greenColor(), forState: UIControlState.Selected)
+            defaultTextLabel.setTitleColor(UIColor.green, for: UIControl.State())
+            defaultTextLabel.setTitleColor(UIColor.green, for: UIControl.State.selected)
             defaultTextActive = 1
             smsNumber = parseUserText + "," + smsNumber
             btnColor = "GreenText"
@@ -102,26 +102,26 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         
     }
     
-    @IBAction func logOut(sender: AnyObject) {
+    @IBAction func logOut(_ sender: AnyObject) {
         
         logOut()
     }
     
-    @IBAction func future(sender: AnyObject) {
+    @IBAction func future(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("messageToFuture", sender: self)
+        self.performSegue(withIdentifier: "messageToFuture", sender: self)
 
     }
     
-    @IBAction func today(sender: AnyObject) {
+    @IBAction func today(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("messageToToday", sender: self)
+        self.performSegue(withIdentifier: "messageToToday", sender: self)
 
     }
     
-    @IBAction func past(sender: AnyObject) {
+    @IBAction func past(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("messageToPast", sender: self)
+        self.performSegue(withIdentifier: "messageToPast", sender: self)
 
     }
     
@@ -129,19 +129,19 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     
     @IBOutlet var messageLabel: UILabel!
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!){
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!){
         
         print("Message: \(message)")
         
         
-        let date4 = NSDate()
-        let dateFormatter4 = NSDateFormatter()
+        let date4 = Date()
+        let dateFormatter4 = DateFormatter()
         dateFormatter4.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let currentDate1 = dateFormatter4.stringFromDate(date4)
-        currentDate = dateFormatter4.dateFromString(currentDate1)!
+        let currentDate1 = dateFormatter4.string(from: date4)
+        currentDate = dateFormatter4.date(from: currentDate1)!
         
-        let date3 = dateFormatter4.stringFromDate(schedDateTime.date)
-        defaultDateTime = dateFormatter4.dateFromString(date3)!
+        let date3 = dateFormatter4.string(from: schedDateTime.date)
+        defaultDateTime = dateFormatter4.date(from: date3)!
         print("Default Date: \(date3)")
         
         schedDateTime.date = defaultDateTime
@@ -149,7 +149,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     }
     
     
-    @IBAction func clearAll(sender: AnyObject) {
+    @IBAction func clearAll(_ sender: AnyObject) {
       
         smsNumber = ""
         mmsNumber = ""
@@ -172,19 +172,24 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         defaultColors()
         self.sendEmailBtn.tintColor = self.view.tintColor
         self.sendTextBtn.tintColor = self.view.tintColor
-        defaultEmailLabel.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
-        defaultTextLabel.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
+        defaultEmailLabel.setTitleColor(UIColor.red, for: UIControl.State())
+        defaultTextLabel.setTitleColor(UIColor.red, for: UIControl.State())
         changeRecurrentBtnColor()
-        schedDateTime.date = NSDate()
+        schedDateTime.date = Date()
+        ema1 = []
+        ema = ""
+        text1 = []
+        countTextNumbers = 0
+        countEmailAddresses = 0
         
-        let alert = UIAlertController(title: "All fields are clear!", message: "Start entering your information again.", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+        let alert = UIAlertController(title: "All fields are clear!", message: "Start entering your information again.", preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             
         }))
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
         
 
         
@@ -194,28 +199,104 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         
         if emailActive == 1 {
             
-            self.sendEmailBtn.tintColor = UIColor.greenColor()
+            self.sendEmailBtn.tintColor = UIColor.green
             
+            /*for address in ema1 {
+            
+                alertForMultipleEmails(address: address)
+                
+                print(address)
+                
+            }*/
         }
         
         if textActive == 1 {
             
-            self.sendTextBtn.tintColor = UIColor.greenColor()
+            self.sendTextBtn.tintColor = UIColor.green
             
         }
         
         if defaultEmailActive == 1 {
         
-            defaultEmailLabel.setTitleColor(UIColor.greenColor(), forState: UIControlState.Normal)
+            defaultEmailLabel.setTitleColor(UIColor.green, for: UIControl.State())
         
         }
         
         if defaultTextActive == 1 {
             
-            defaultTextLabel.setTitleColor(UIColor.greenColor(), forState: UIControlState.Normal)
+            defaultTextLabel.setTitleColor(UIColor.green, for: UIControl.State())
             
         }
     }
+    
+    /*func alertForMultipleEmails(address: String) {
+        
+        print(ema1.count)
+        print(ema1)
+        
+        if countEmailAddresses > 1 {
+            
+            if ema1 != [] {
+                
+                
+            //for i in 0..<ema1.count {
+            //for address in ema1 {
+                
+                //let alert = UIAlertController(title: "Multiple emails exist for this contact.", message: "Did you want this one? \r\r \(ema1[i])", preferredStyle: UIAlertControllerStyle.alert)
+                
+                print(address)
+                
+                let alert = UIAlertController(title: "Multiple emails exist for this contact.", message: "Did you want this one? \r \(address)", preferredStyle: UIAlertControllerStyle.alert)
+                
+                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
+                    
+                    alert.dismiss(animated: true, completion: nil)
+                    
+                    emailActive = 1
+                    
+                    //emailAddressesSelected = ema1[i] + "," + emailAddressesSelected
+                    
+                    emailAddressesSelected = address + "," + emailAddressesSelected
+                    
+                    self.to.text = smsNumber + emailAddressesSelected
+                    
+                    //self.performSegue(withIdentifier: "backToHome", sender: self)
+                    
+                    ema1 = []
+                    
+                }))
+                
+                
+                alert.addAction(UIAlertAction(title: "No", style: .default, handler: { action in
+                    
+                    alert.dismiss(animated: true, completion: nil)
+                    //self.performSegue(withIdentifier: "backToHome", sender: self)
+                    print(ema1)
+                    
+                    if emailAddressesSelected == "" {
+                        
+                        emailActive = 0
+                        
+                        self.sendEmailBtn.tintColor = UIColor.blue
+                        
+                    }
+                    
+                    ema1 = []
+                    
+                    
+                }))
+                
+                self.present(alert, animated: true, completion: nil)
+                
+                
+              //}
+                
+            }
+            
+        }
+        
+    }*/
+    
 
     
     /*@IBAction func emailContacts(sender: AnyObject) {
@@ -255,14 +336,14 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     }*/
     @IBOutlet var recurrentBtn: UIButton!
     
-    @IBAction func recurrent(sender: AnyObject) {
+    @IBAction func recurrent(_ sender: AnyObject) {
         
         message = messageText.text
         print("Message: \(message)")
         
         changeRecurrentBtnColor()
         
-        //self.performSegueWithIdentifier("messageToRecurrent", sender: self)
+        self.performSegue(withIdentifier: "messageToRecurrent", sender: self)
     
     }
     
@@ -270,11 +351,11 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         
         if (period == "" && freq == "") || (period == "0" && freq == "0") || (period == "0" && freq != "0") || (period != "0" && freq == "0") || (period != "0" && freq != "0") && (num == "" || num == "0") {
             
-            recurrentBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+            recurrentBtn.setTitleColor(UIColor.white, for: UIControl.State())
             
         } else {
             
-            recurrentBtn.setTitleColor(UIColor.greenColor(), forState: UIControlState.Normal)
+            recurrentBtn.setTitleColor(UIColor.green, for: UIControl.State())
             
         }
         
@@ -284,91 +365,91 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     
     @IBOutlet var schedDateTime: UIDatePicker!
     
-    @IBAction func datePickerAction(sender: AnyObject) {
+    @IBAction func datePickerAction(_ sender: AnyObject) {
         
-        let dateFormatter = NSDateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        strDate1 = dateFormatter.stringFromDate(schedDateTime.date)
-        //self.selectedDate.text = strDate
+        strDate1 = dateFormatter.string(from: schedDateTime.date)
+        //selectedDate = strDate1
         
     }
     
-    @IBAction func send(sender: AnyObject) {
+    @IBAction func send(_ sender: AnyObject) {
         
-        if (PFUser.currentUser() == "" || userEmail == "") {
+        if (PFUser.current() == nil || userEmail == "") {
             
-            let alert = UIAlertController(title: "Error!", message: "Please login again.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Error!", message: "Please login again.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 
                 self.logOut()
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
         } else {
         
         
         if (emailAddressesSelected == "" && smsNumber == "" && mmsNumber == "" && to.text == "") {
             
-            let alert = UIAlertController(title: "Error!", message: "You must pick an email or text contact.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Error!", message: "You must pick an email or text contact.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
         } else {
             
             if (messageText.text == "") {
                 
-                let alert = UIAlertController(title: "Error!", message: "You must enter a message.", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+                let alert = UIAlertController(title: "Error!", message: "You must enter a message.", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     
                 }))
                 
-                self.presentViewController(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
                 
             } else {
             
-            schedDateTime.datePickerMode = UIDatePickerMode.Date
-            let dateFormatter1 = NSDateFormatter()
+            schedDateTime.datePickerMode = UIDatePicker.Mode.date
+            let dateFormatter1 = DateFormatter()
             dateFormatter1.dateFormat = "yyyy-MM-dd"
-            selectedDate = dateFormatter1.stringFromDate(schedDateTime.date)
+            selectedDate = dateFormatter1.string(from: schedDateTime.date)
             print("Date: \(selectedDate)")
             
-            schedDateTime.datePickerMode = UIDatePickerMode.Time
+            schedDateTime.datePickerMode = UIDatePicker.Mode.time
             let pickerTime = schedDateTime.date
-            let time = pickerTime.dateByAddingTimeInterval(-60)
-            let timeFormatter = NSDateFormatter()
+            let time = pickerTime.addingTimeInterval(-60)
+            let timeFormatter = DateFormatter()
             timeFormatter.dateFormat = "HH:mm:ss"
             //selectedTime = timeFormatter.stringFromDate(schedDateTime.date)
-            selectedTime = timeFormatter.stringFromDate(time)
+            selectedTime = timeFormatter.string(from: time)
             print("Time: \(selectedTime)")
             
         
-        let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/written6.php")
-        let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-        let request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 8.0)
-        request.HTTPMethod = "POST"
+        let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/written6.php")
+        let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 8.0)
+        request.httpMethod = "POST"
         
         // set Content-Type in HTTP header
         let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
         let contentType = "multipart/form-data; boundary=" + boundaryConstant
-        NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
+        URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
         
             if to.text == emailAddressesSelected + smsNumber || to.text == smsNumber + emailAddressesSelected {
                 
                
             } else {
                 
-                print(to.text)
+                print(to.text!)
                 print(smsNumber + emailAddressesSelected)
                 print(emailAddressesSelected + smsNumber)
                 emailAddressesSelected = to.text!
@@ -377,39 +458,71 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             }
                 
         // set data
-        let dataString = "send1=\(messageText.text)&date1=\(selectedDate)&date2=\(selectedTime)&email1=\(emailAddressesSelected)&text=\(smsNumber)&timezone=\(selectedDate) \(selectedTime)&ltzName=\(ltzName)&userEmail=\(parseUser)&period=\(period)&recDay=\(num)&frequency=\(freq)&endDate=\(end)"
+        let dataString = "send1=\(messageText.text!)&date1=\(selectedDate)&date2=\(selectedTime)&email1=\(emailAddressesSelected)&text=\(smsNumber)&timezone=\(selectedDate) \(selectedTime)&ltzName=\(ltzName)&userEmail=\(parseUser)&userText=\(parseUserText)&period=\(period)&recDay=\(num)&frequency=\(freq)&endDate=\(end)"
        
-        let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-        request.HTTPBody = requestBodyData
+        let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
+        request.httpBody = requestBodyData
+                
+                let session = URLSession.shared
+                
+                let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
+                    
+                    if error == nil {
+                        
+                        print("Data: \(data!)")
+                        
+                        print("Response: \(response!)")
+                        
+                        let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
+                        
+                        print("API Response: \(String(describing: results!))")
+                        
+                        
+                    } else {
+                        
+                        print("Error: \(error!)")
+                        
+                    }
+                    
+                })
+                
+                
+                task.resume()
         
         // set content length
-        //NSURLProtocol.setProperty(requestBodyData.length, forKey: "Content-Length", inRequest: request)
             
-        var response: NSURLResponse? = nil
-        //var error: NSError? = nil
-        let reply: NSData?
-        do {
-            reply = try NSURLConnection.sendSynchronousRequest(request, returningResponse:&response)
-        } catch let error1 as NSError {
-            //error = error1
-            print(error1)
+        //var response: URLResponse? = nil
+        
+        //var reply: Data?
+                
+        //do {
+            
+            
+            
+            //reply = try NSURLConnection.sendSynchronousRequest(request as URLRequest, returning:&response)
+                
+           //dataTaskWithRequest:completionHandler:]
+        /*} catch let error as NSError {
+            
+            print(error)
+            
             reply = nil
         }
         
-        let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-        print("API Response: \(results)")
+        let results = NSString(data:reply!, encoding:String.Encoding.utf8.rawValue)
+        print("API Response: \(String(describing: results))")*/
             
-        print("send1=\(messageText.text)&date1=\(selectedDate)&date2=\(selectedTime)&email1=\(emailAddressesSelected)&text=\(smsNumber)&timezone=\(selectedDate) \(selectedTime)&ltzName=\(ltzName)&userEmail=\(parseUser)&period=\(period)&recDay=\(num)&frequency=\(freq)&endDate=\(end)")
+        print("send1=\(messageText.text!)&date1=\(selectedDate)&date2=\(selectedTime)&email1=\(emailAddressesSelected)&text=\(smsNumber)&timezone=\(selectedDate) \(selectedTime)&ltzName=\(ltzName)&userEmail=\(parseUser)&period=\(period)&recDay=\(num)&frequency=\(freq)&endDate=\(end)")
        
-        let alert = UIAlertController(title: "Your reminder was saved.", message: "Date: \(selectedDate) \r" + "Time: \(selectedTime) \r" + "Sent to: \(emailAddressesSelected) \(smsNumber) \r" + "Thank you!", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+        let alert = UIAlertController(title: "Your reminder was saved.", message: "Date: \(selectedDate) \r" + "Time: \(selectedTime) \r" + "Sent to: \(emailAddressesSelected) \(smsNumber) \r" + "Thank you!", preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             
             
         }))
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
          
             smsNumber = ""
             mmsNumber = ""
@@ -423,7 +536,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             period = ""
             num = ""
             freq = ""
-            schedDateTime.datePickerMode = UIDatePickerMode.DateAndTime
+            schedDateTime.datePickerMode = UIDatePicker.Mode.dateAndTime
             keyboardInactive()
             emailActive = 0
             textActive = 0
@@ -432,11 +545,11 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             defaultColors()
             changeRecurrentBtnColor()
             btnColor = ""
-            defaultEmailLabel.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
-            defaultTextLabel.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
+            defaultEmailLabel.setTitleColor(UIColor.red, for: UIControl.State())
+            defaultTextLabel.setTitleColor(UIColor.red, for: UIControl.State())
             self.sendEmailBtn.tintColor = self.view.tintColor
             self.sendTextBtn.tintColor = self.view.tintColor
-            schedDateTime.date = NSDate()
+            schedDateTime.date = Date()
             
                  }
             }
@@ -444,13 +557,13 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         
     }
    
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     
         self.view.endEditing(true)
         
     }
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         return true
     }
@@ -466,52 +579,55 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        /*scrollView = UIScrollView(frame: view.bounds)
-        scrollView.backgroundColor = UIColor.clearColor()
-        scrollView.scrollEnabled = true;
-        scrollView.contentSize.height = 1800
-        scrollView.addSubview(messageLabel)
-        scrollView.addSubview(messageText)
-        scrollView.addSubview(schedDateTime)
-        view.addSubview(scrollView)*/
-        self.navigationController?.navigationBarHidden = true
+        self.navigationController?.isNavigationBarHidden = true
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:#selector(ViewController.keyboardActive), name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:#selector(ViewController.keyboardInactive), name: UIKeyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector:#selector(ViewController.keyboardActive), name: UIResponder.keyboardWillShowNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector:#selector(ViewController.keyboardInactive), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         to.text = smsNumber + emailAddressesSelected
         
         changeRecurrentBtnColor()
         
-        print(userEmail)
+        print("User Email: \(userEmail)")
+        
     }
     
-    func keyboardActive() {
+    @objc func keyboardActive() {
         
         messageLabel.text = "Tap here to lower keyboard."
-        messageLabel.backgroundColor = UIColor.clearColor()
-        messageLabel.font = messageLabel.font.fontWithSize(17)
+        messageLabel.backgroundColor = UIColor.clear
+        messageLabel.font = messageLabel.font.withSize(17)
         
     }
 
-    func keyboardInactive() {
+    @objc func keyboardInactive() {
             
         messageLabel.text = "Enter Message"
-        messageLabel.backgroundColor = UIColor.clearColor()
-        messageLabel.font = messageLabel.font.fontWithSize(17)
+        messageLabel.backgroundColor = UIColor.clear
+        messageLabel.font = messageLabel.font.withSize(17)
         message = messageText.text
         
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         
         defaultColors()
         
-        self.navigationController?.navigationBarHidden = true
+        self.navigationController?.isNavigationBarHidden = true
         
         schedDateTime.date = defaultDateTime
         
-        noInternetConnection()
+        if (userEmail.count > 0 || userEmail != "") {
+            
+            noInternetConnection()
+            
+        } else {
+            
+            self.performSegue(withIdentifier: "homeToLogin", sender: self)
+        }
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -524,32 +640,23 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         
         if Reachability.isConnectedToNetwork() == true {
             
-            parseUser = PFUser.currentUser()!.email!
-            parseUserText = PFUser.currentUser()!["mobilePhoneCarrier"]! as! String
-    
-            print(parseUserText)
+            print("Internet connection OK")
             
-            if parseUser != "" {
-                // Do stuff with the user
-                print("Internet connection OK")
-                
-                print("View Controller: \(period) \(num) \(freq) \n\r \(end)")
-                
-                if (message != "") {
-                    
-                    messageText.text = message
-                    print("Message: \(message)")
-                }
-                
-                tzName()  // "America/Sao_Paulo"
-                
-                
-            } else {
-                // Show the signup or login screen
-                
-                self.performSegueWithIdentifier("homeToLogin", sender: self)
+            print("View Controller: \(period) \(num) \(freq) \n\r \(end)")
             
+            parseUser = PFUser.current()!.email!
+            parseUserText = PFUser.current()!["mobilePhoneCarrier"]! as! String
+            
+            print("Parse User: \(parseUser)")
+            print("Parse User Text: \(parseUserText)")
+            
+            if (message != "") {
+                
+                messageText.text = message
+                print("Message: \(message)")
             }
+            
+            tzName()  // "America/Sao_Paulo"
             
             
         } else {
@@ -557,18 +664,18 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
-            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "Try Again?", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 
                 self.noInternetConnection()
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
         }
@@ -577,7 +684,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     
     func tzName() {
         
-        ltzName = NSTimeZone.localTimeZone().name
+        ltzName = TimeZone.autoupdatingCurrent.identifier
         //ltzName = ltzName1.stringByReplacingOccurrencesOfString("/", withString: " ")
         print("Timezone Name: \(ltzName)")
         
@@ -597,7 +704,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         period = ""
         num = ""
         freq = ""
-        schedDateTime.datePickerMode = UIDatePickerMode.DateAndTime
+        schedDateTime.datePickerMode = UIDatePicker.Mode.dateAndTime
         keyboardInactive()
         pastReminders = []
         todayReminders = []
@@ -609,17 +716,17 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         defaultTextActive = 0
         defaultColors()
         btnColor = ""
-        defaultEmailLabel.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
-        defaultTextLabel.setTitleColor(UIColor.redColor(), forState: UIControlState.Normal)
+        defaultEmailLabel.setTitleColor(UIColor.red, for: UIControl.State())
+        defaultTextLabel.setTitleColor(UIColor.red, for: UIControl.State())
         self.sendEmailBtn.tintColor = self.view.tintColor
         self.sendTextBtn.tintColor = self.view.tintColor
         changeRecurrentBtnColor()
-        schedDateTime.date = NSDate()
+        schedDateTime.date = Date()
         
         PFUser.logOut()
         userEmail = ""
         //signupActive == true
-        self.performSegueWithIdentifier("homeToLogin", sender: self)
+        self.performSegue(withIdentifier: "homeToLogin", sender: self)
         
     }
   

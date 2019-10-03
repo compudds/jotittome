@@ -10,183 +10,215 @@ import UIKit
 import AddressBookUI
 import Parse
 import MessageUI
+import ContactsUI
 
 var emailAddressesSelected = String()
 
-class EmailViewController: UIViewController, ABPeoplePickerNavigationControllerDelegate, MFMailComposeViewControllerDelegate {
+var ema = String()
+var ema1 = [String()]
+var countEmailAddresses = Int()
+//var emailLabel = [String()]
+
+class EmailViewController: UIViewController, ABPeoplePickerNavigationControllerDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, UIPickerViewDelegate, CNContactPickerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        /*self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Contact Us", style: .Plain, target: self, action: Selector("contactUs"))*/
-        self.navigationController?.navigationBarHidden = true
+        self.navigationController?.isNavigationBarHidden = true
         
-        /*if(emailAddressesSelected > ""){
-            var alert = UIAlertController(title: "Emails", message: "You selected the following emails: \(emailAddressesSelected)", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
-                
-                alert.dismissViewControllerAnimated(true, completion: nil)
-                self.didTouchUpInsidePickButton()
-            }))
-            alert.addAction(UIAlertAction(title: "Re-Set All Emails", style: .Default, handler: { action in
-                
-                alert.dismissViewControllerAnimated(true, completion: nil)
-                emailAddressesSelected = ""
-                self.didTouchUpInsidePickButton()
-                
-            }))
+        if #available(iOS 9.0, *) {
+            showContacts()
+        
+        } else {
             
-            self.presentViewController(alert, animated: true, completion: nil)
-            
-        } else {*/
+            didTouchUpInsidePickButton()
         
-        didTouchUpInsidePickButton()
-            
-        //}
-        
-    }
-    
-    //func didTouchUpInsidePickButton(item: UIBarButtonItem) {
-    func didTouchUpInsidePickButton() {
-        let picker = ABPeoplePickerNavigationController()
-        picker.peoplePickerDelegate = self
-        picker.displayedProperties = [NSNumber(int: kABPersonEmailProperty)]
-        
-        if picker.respondsToSelector(Selector("predicateForEnablingPerson")) {
-            picker.predicateForEnablingPerson = NSPredicate(format: "emailAddresses.@count > 0")
         }
         
-        presentViewController(picker, animated: true, completion: nil)
+    }
+    
+    func didTouchUpInsidePickButton() {
+        
+        let picker = CNContactPickerViewController()
+        picker.delegate = self
+        picker.displayedPropertyKeys = [ABPersonEmailAddressesProperty]
+        
+        if picker.responds(to: #selector(getter: CNContactPickerViewController.predicateForEnablingContact)) {
+            picker.predicateForEnablingContact = NSPredicate(format: "emailAddresses.@count > 0")
+        }
+        
+        present(picker, animated: true, completion: nil)
         
     }
     
-    func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController, didSelectPerson person: ABRecordRef, property: ABPropertyID, identifier: ABMultiValueIdentifier) {
-        let multiValue: ABMultiValueRef = ABRecordCopyValue(person, property).takeRetainedValue()
-        let index = ABMultiValueGetIndexForIdentifier(multiValue, identifier)
-        let email = ABMultiValueCopyValueAtIndex(multiValue, index).takeRetainedValue() as! String
-        emailAddressesSelected = email + "," + emailAddressesSelected
-        print("\(emailAddressesSelected)")
-        emailActive = 1
-        self.performSegueWithIdentifier("backToHome", sender: self)
+    func showContacts() {
+        
+        let picker = CNContactPickerViewController()
+        
+        picker.delegate = self
+        
+        picker.predicateForEnablingContact = NSPredicate(format: "emailAddresses.@count > 0", argumentArray: nil)
+        
+        present(picker, animated: true, completion: nil)
+    }
+
+    func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
+        
+        print(contact.emailAddresses.count)
+        
+        countEmailAddresses = contact.emailAddresses.count
+        
+        let arrKeys = [CNContactEmailAddressesKey]
+        
+        if contact.emailAddresses.count > 1 {
+            
+            for address in contact.emailAddresses {
+                
+               ema1 = [address.value as String as String] + ema1
+           
+                ema = address.value as String + "," + ema
+            
+                picker.displayedPropertyKeys = arrKeys
+                
+                print("ema1: \(ema1)")
+                
+                print(address)
+                
+                emailActive = 1
+                
+                self.performSegue(withIdentifier: "evcToEtvc", sender: self)
+                
+            }
+            
+            
+        
+        } else {
+            
+            for address in contact.emailAddresses {
+                
+                let ema = address.value as String
+                
+                picker.displayedPropertyKeys = arrKeys
+                
+                print(ema)
+                
+                emailAddressesSelected = ema + "," + emailAddressesSelected
+                
+                emailActive = 1
+                
+                self.performSegue(withIdentifier: "backToHome", sender: self)
+            }
+            
+            
+            
+        }
         
     }
-    
-    func peoplePickerNavigationController(peoplePicker: ABPeoplePickerNavigationController, shouldContinueAfterSelectingPerson person: ABRecordRef, property: ABPropertyID, identifier: ABMultiValueIdentifier) -> Bool {
-        
-        peoplePickerNavigationController(peoplePicker, didSelectPerson: person, property: property, identifier: identifier)
-        
-        peoplePicker.dismissViewControllerAnimated(true, completion: nil)
-        
-        self.performSegueWithIdentifier("backToHome", sender: self)
-        
-        return false;
-    }
-    
-    
-    func peoplePickerNavigationControllerDidCancel(peoplePicker: ABPeoplePickerNavigationController) {
-        
-        peoplePicker.dismissViewControllerAnimated(true, completion: nil)
+
+    func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
+        picker.dismiss(animated: true, completion: nil)
         
         if(emailAddressesSelected > ""){
             
-            let alert = UIAlertController(title: "Emails", message: "You selected the following emails: \(emailAddressesSelected)", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+            let alert = UIAlertController(title: "Emails", message: "You selected the following emails: \(emailAddressesSelected)", preferredStyle: UIAlertController.Style.alert)
+            alert.addTextField(configurationHandler: { (textField) -> Void in
                 textField.placeholder = "Emails, separate by comma."
                 
                 
-                alert.addAction(UIAlertAction(title: "Enter Manual Emails", style: .Default, handler: { action in
+            alert.addAction(UIAlertAction(title: "Enter Manual Emails", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     emailActive = 1
-                    emailAddressesSelected = "\(textField.text)," + emailAddressesSelected
-                    self.performSegueWithIdentifier("backToHome", sender: self)
+                    emailAddressesSelected = "\(String(describing: textField.text))," + emailAddressesSelected
+                    self.performSegue(withIdentifier: "backToHome", sender: self)
                 }))
             })
-
-            alert.addAction(UIAlertAction(title: "Done", style: .Default, handler: { action in
+            
+            alert.addAction(UIAlertAction(title: "Done", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
-                self.performSegueWithIdentifier("backToHome", sender: self)
+                alert.dismiss(animated: true, completion: nil)
+                self.performSegue(withIdentifier: "backToHome", sender: self)
                 
             }))
-            alert.addAction(UIAlertAction(title: "Re-Set All Emails", style: .Default, handler: { action in
+            alert.addAction(UIAlertAction(title: "Re-Set All Emails", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 emailAddressesSelected = ""
                 emailActive = 0
                 btnColor = ""
-                self.didTouchUpInsidePickButton()
+                //self.didTouchUpInsidePickButton()
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
-        
+            self.present(alert, animated: true, completion: nil)
+            
             
         } else {
             
-            let alert = UIAlertController(title: "Emails", message: "No emails were selected.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+            let alert = UIAlertController(title: "Emails", message: "No emails were selected.", preferredStyle: UIAlertController.Style.alert)
+            alert.addTextField(configurationHandler: { (textField) -> Void in
                 textField.placeholder = "Emails, separate by comma."
                 
                 
-                alert.addAction(UIAlertAction(title: "Enter Manual Emails", style: .Default, handler: { action in
+                alert.addAction(UIAlertAction(title: "Enter Manual Emails", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     
-                    emailAddressesSelected = "\(textField.text)," + emailAddressesSelected
-                    self.performSegueWithIdentifier("backToHome", sender: self)
+                    emailAddressesSelected = "\(String(describing: textField.text))," + emailAddressesSelected
+                    self.performSegue(withIdentifier: "backToHome", sender: self)
                 }))
                 
             })
             
-            alert.addAction(UIAlertAction(title: "None", style: .Default, handler: { action in
+            alert.addAction(UIAlertAction(title: "None", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
-                self.performSegueWithIdentifier("backToHome", sender: self)
+                alert.dismiss(animated: true, completion: nil)
+                self.performSegue(withIdentifier: "backToHome", sender: self)
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
-
+            self.present(alert, animated: true, completion: nil)
+            
             
         }
-  
+        
+
     }
     
     func contactUs(){
         
-        let alert = UIAlertController(title: "Contact Us", message: "Email or rate us.", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "Email", style: .Default, handler: { action in
+        let alert = UIAlertController(title: "Contact Us", message: "Email or rate us.", preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "Email", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             self.sendEmail()
             
         }))
         
-        alert.addAction(UIAlertAction(title: "Rate Us", style: .Default, handler: { action in
+        alert.addAction(UIAlertAction(title: "Rate Us", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             self.rateUs()
             
         }))
         
-        alert.addAction(UIAlertAction(title: "Home", style: .Default, handler: { action in
+        alert.addAction(UIAlertAction(title: "Home", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             
-            self.performSegueWithIdentifier("backToHome", sender: self)
+            self.performSegue(withIdentifier: "backToHome", sender: self)
             
         }))
 
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { action in
+        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             
             
         }))
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
         
     }
     
@@ -200,29 +232,32 @@ class EmailViewController: UIViewController, ABPeoplePickerNavigationControllerD
         
         mc.setToRecipients(toRecipents)
         
-        self.presentViewController(mc, animated: true, completion: nil)
+        self.present(mc, animated: true, completion: nil)
         
     }
     
-    func mailComposeController(controller:MFMailComposeViewController, didFinishWithResult result:MFMailComposeResult, error:NSError?) {
+    func mailComposeController(_ controller:MFMailComposeViewController, didFinishWith result:MFMailComposeResult, error:Error?) {
         switch result.rawValue {
-        case MFMailComposeResultCancelled.rawValue:
+        case MFMailComposeResult.cancelled.rawValue:
             print("Mail cancelled")
-        case MFMailComposeResultSaved.rawValue:
+        case MFMailComposeResult.saved.rawValue:
             print("Mail saved")
-        case MFMailComposeResultSent.rawValue:
+        case MFMailComposeResult.sent.rawValue:
             print("Mail sent")
-        case MFMailComposeResultFailed.rawValue:
+        case MFMailComposeResult.failed.rawValue:
             print("Mail sent failure: \(error!.localizedDescription)")
         default:
             break
         }
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     func rateUs() {
         
-        UIApplication.sharedApplication().openURL(NSURL(string : "itms-apps://itunes.apple.com/app/id668352073")!);
+        if let url = URL(string: "itms-apps://itunes.apple.com/app/id668352073") {
+            UIApplication.shared.open(url, options: [:])
+        }
+        
         
     }
 

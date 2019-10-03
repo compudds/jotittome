@@ -16,16 +16,16 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     
     var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
     
-    func displayAlert(title:String, error:String) {
+    func displayAlert(_ title:String, error:String) {
         
-        let alert = UIAlertController(title: title, message: error, preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+        let alert = UIAlertController(title: title, message: error, preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             
         }))
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
         
     }
 
@@ -42,23 +42,23 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     
     @IBOutlet var carrierPicker: UIPickerView!
     
-    @IBAction func update(sender: AnyObject) {
+    @IBAction func update(_ sender: AnyObject) {
         
         var error = ""
         
         
-        activityIndicator = UIActivityIndicatorView(frame: CGRectMake(0, 0, 50, 50))
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
+        activityIndicator.style = UIActivityIndicatorView.Style.gray
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
-        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
+        UIApplication.shared.beginIgnoringInteractionEvents()
         
         if username.text == "" || emailaddress.text == "" || mobilePhone.text == "" || cellCarrier.text == ""{
             
             self.activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
             error = "Please enter all fields."
             
@@ -66,7 +66,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             
         } else {
             
-            let user = PFUser.currentUser()
+            let user = PFUser.current()
             
             if user != nil {
                 
@@ -75,19 +75,19 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
                 userEmail = self.emailaddress.text! + ","
                 // other fields can be set just like with PFObject
                 let cleanNumber = mobilePhone.text
-                clean = cleanNumber!.stringByReplacingOccurrencesOfString("[a-zA-Z\\-\\*\\#\\@\\+\\(\\)\\.\" \"]", withString: "", options: .RegularExpressionSearch)
+                clean = cleanNumber!.replacingOccurrences(of: "[a-zA-Z\\-\\*\\#\\@\\+\\(\\)\\.\" \"]", with: "", options: .regularExpression)
                 
                 print(clean)
                 
                 assignCarrier()
                 
                 user!["mobilePhone"]! = clean
-                user!["carrier"]! = self.cellCarrier.text as AnyObject!
+                user!["carrier"]! = self.cellCarrier.text as AnyObject
                 user!["mobilePhoneCarrier"]! = clean + carrierSMS
                 userText = clean + carrierSMS + ","
                 user!.saveEventually()
-                print(user!.username)
-                print(user!.email)
+                print(user!.username!)
+                print(user!.email!)
                 print(user!["mobilePhone"]!)
                 print(user!["carrier"]!)
                 print(user!["mobilePhoneCarrier"]!)
@@ -95,35 +95,35 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             } else {
                 
                 self.activityIndicator.stopAnimating()
-                UIApplication.sharedApplication().endIgnoringInteractionEvents()
+                UIApplication.shared.endIgnoringInteractionEvents()
                 
-                let alert = UIAlertController(title: "Error Updating!", message: "Please log out and log back in, thentry updating again.", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Log Out?", style: .Default, handler: { action in
+                let alert = UIAlertController(title: "Error Updating!", message: "Please log out and log back in, thentry updating again.", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "Log Out?", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     self.logOut()
                     
                 }))
                 
-                alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { action in
+                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     
                     
                 }))
                 
-                self.presentViewController(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
                 
             }
             
             //updateSettings.text = "Your settings have been saved."
             self.activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
-            let alert = UIAlertController(title: "Thank You!", message: "Your settings have been saved.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Thank You!", message: "Your settings have been saved.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 self.username.text = ""
                 self.emailaddress.text = ""
                 self.emailaddress.text = ""
@@ -132,7 +132,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
         }
@@ -140,49 +140,49 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         
     }
     
-    @IBAction func backToMessages(sender: AnyObject) {
+    @IBAction func backToMessages(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("settingsToMessages", sender: self)
+        self.performSegue(withIdentifier: "settingsToMessages", sender: self)
         
     }
-    @IBAction func contactUs(sender: AnyObject) {
+    @IBAction func contactUs(_ sender: AnyObject) {
         
         contactUs()
         
     }
 
-    var pickerDataSource = ["Alltel", "AT&T", "Boost", "Cricket", "Metro PCS", "O2", "Orange", "Pinger", "Rogers", "Sprint PCS", "T-Mobile", "Text Free", "US Cellular", "Verizon", "Virgin", "Quest"]
+    var pickerDataSource = ["Alltel", "AT&T", "Boost", "Cricket", "Metro PCS", "O2", "Orange", "Republic", "Rogers", "Sprint PCS", "T-Mobile", "US Cellular", "Verizon", "Virgin", "Quest"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        self.navigationController?.navigationBarHidden = true
+        self.navigationController?.isNavigationBarHidden = true
         clean = ""
         self.carrierPicker.dataSource = self
         self.carrierPicker.delegate = self
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         
         //self.navigationController?.navigationBarHidden = true
         noInternetConnection()
     }
 
     
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return pickerDataSource.count
     }
     
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         
         return pickerDataSource[row]
     }
     
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         
         self.namePicked = pickerDataSource[row]
         print(pickerDataSource[row])
@@ -226,11 +226,12 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             carrierSMS = "@orange.net"
             carrierMMS = "@orange.net"
         }
-        if (self.namePicked == "Pinger"){
+        if (self.namePicked == "Republic"){
             
-            carrierSMS = "@mobile.pinger.com"
-            carrierMMS = "@mobile.pinger.com"
+            carrierSMS = "@text.republicwireless.com"
+            carrierMMS = "@text.republicwireless.com"
         }
+        
         if (self.namePicked == "Rogers"){
             
             carrierSMS = "@sms.rogers.com"
@@ -246,11 +247,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             carrierSMS = "@tmomail.net"
             carrierMMS = "@tmomail.net"
         }
-        if (self.namePicked == "Text Free"){
-            
-            carrierSMS = "@textfree.us"
-            carrierMMS = "@textfree.us"
-        }
+       
         if (self.namePicked == "US Cellular"){
             
             carrierSMS = "@email.uscc.net"
@@ -287,38 +284,38 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     
     func contactUs(){
         
-        let alert = UIAlertController(title: "Contact Us", message: "Email or rate us.", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "Email", style: .Default, handler: { action in
+        let alert = UIAlertController(title: "Contact Us", message: "Email or rate us.", preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "Email", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             self.sendEmail()
             
         }))
         
-        alert.addAction(UIAlertAction(title: "Rate Us", style: .Default, handler: { action in
+        alert.addAction(UIAlertAction(title: "Rate Us", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             self.rateUs()
             
         }))
         
-        alert.addAction(UIAlertAction(title: "Home", style: .Default, handler: { action in
+        alert.addAction(UIAlertAction(title: "Home", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             
-            self.performSegueWithIdentifier("settingsToMessages", sender: self)
-            
-        }))
-        
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { action in
-            
-            alert.dismissViewControllerAnimated(true, completion: nil)
-            
+            self.performSegue(withIdentifier: "settingsToMessages", sender: self)
             
         }))
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
+            
+            alert.dismiss(animated: true, completion: nil)
+            
+            
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
         
     }
     
@@ -332,29 +329,31 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         
         mc.setToRecipients(toRecipents)
         
-        self.presentViewController(mc, animated: true, completion: nil)
+        self.present(mc, animated: true, completion: nil)
         
     }
     
-    func mailComposeController(controller:MFMailComposeViewController, didFinishWithResult result:MFMailComposeResult, error:NSError?) {
+    func mailComposeController(_ controller:MFMailComposeViewController, didFinishWith result:MFMailComposeResult, error:Error?) {
         switch result.rawValue {
-        case MFMailComposeResultCancelled.rawValue:
+        case MFMailComposeResult.cancelled.rawValue:
             print("Mail cancelled")
-        case MFMailComposeResultSaved.rawValue:
+        case MFMailComposeResult.saved.rawValue:
             print("Mail saved")
-        case MFMailComposeResultSent.rawValue:
+        case MFMailComposeResult.sent.rawValue:
             print("Mail sent")
-        case MFMailComposeResultFailed.rawValue:
+        case MFMailComposeResult.failed.rawValue:
             print("Mail sent failure: \(error!.localizedDescription)")
         default:
             break
         }
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     func rateUs() {
         
-        UIApplication.sharedApplication().openURL(NSURL(string : "itms-apps://itunes.apple.com/app/id668352073")!);
+        if let url = URL(string: "itms-apps://itunes.apple.com/app/id668352073") {
+            UIApplication.shared.open(url, options: [:])
+        }
         
     }
     
@@ -387,7 +386,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         PFUser.logOut()
         userEmail = ""
         //signupActive == true
-        self.performSegueWithIdentifier("settingsToLogIn", sender: self)
+        self.performSegue(withIdentifier: "settingsToLogIn", sender: self)
         
     }
     
@@ -400,7 +399,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             print(userEmail)
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
             
             
@@ -409,17 +408,17 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
-            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "Try Again?", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 self.noInternetConnection()
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
         }
@@ -427,7 +426,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
     }
 
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
     

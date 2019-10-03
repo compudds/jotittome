@@ -21,16 +21,16 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
     
         var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
         
-        func displayAlert(title:String, error:String) {
+        func displayAlert(_ title:String, error:String) {
             
-            let alert = UIAlertController(title: title, message: error, preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+            let alert = UIAlertController(title: title, message: error, preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
         }
     
@@ -52,29 +52,29 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
         
         @IBOutlet var signUpToggleButton: UIButton!
         
-        @IBAction func toggleSignUp(sender: AnyObject) {
+        @IBAction func toggleSignUp(_ sender: AnyObject) {
             
-            self.performSegueWithIdentifier("createToLogin", sender: self)
+            self.performSegue(withIdentifier: "createToLogin", sender: self)
         
         }
         
-        @IBAction func signUp(sender: AnyObject) {
+        @IBAction func signUp(_ sender: AnyObject) {
             
             var error = ""
             
             
-                activityIndicator = UIActivityIndicatorView(frame: CGRectMake(0, 0, 50, 50))
+                activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
                 activityIndicator.center = self.view.center
                 activityIndicator.hidesWhenStopped = true
-                activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
+                activityIndicator.style = UIActivityIndicatorView.Style.gray
                 view.addSubview(activityIndicator)
                 activityIndicator.startAnimating()
-                UIApplication.sharedApplication().beginIgnoringInteractionEvents()
+                UIApplication.shared.beginIgnoringInteractionEvents()
                 
                 if username.text == "" || password.text == "" || emailaddress.text == "" || mobilePhone.text == "" || cellCarrier.text == ""{
                     
                     self.activityIndicator.stopAnimating()
-                    UIApplication.sharedApplication().endIgnoringInteractionEvents()
+                    UIApplication.shared.endIgnoringInteractionEvents()
                     
                     error = "Please enter all fields."
                     
@@ -83,7 +83,7 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
                   } else {
                     
                     let cleanNumber = mobilePhone.text
-                    clean = cleanNumber!.stringByReplacingOccurrencesOfString("[a-zA-Z\\-\\*\\#\\@\\+\\(\\)\\.\" \"]", withString: "", options: .RegularExpressionSearch)
+                    clean = cleanNumber!.replacingOccurrences(of: "[a-zA-Z\\-\\*\\#\\@\\+\\(\\)\\.\" \"]", with: "", options: .regularExpression)
                     
                     print(clean)
                     
@@ -99,23 +99,23 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
                     user["carrier"] = cellCarrier.text
                     user["mobilePhoneCarrier"] = clean + carrierSMS
                     userText = clean + carrierSMS + ","
-                    user.signUpInBackgroundWithBlock {
-                        (succeeded, signupError) -> Void in
+                    user.signUpInBackground {
+                        (succeeded, signupError) in
                         
                         self.activityIndicator.stopAnimating()
-                        UIApplication.sharedApplication().endIgnoringInteractionEvents()
+                        UIApplication.shared.endIgnoringInteractionEvents()
                         
                         if signupError == nil  {
                             // Hooray! Let them use the app now.
                             
-                            print("\(PFUser.currentUser()!.username) signed up")
+                            print("\(String(describing: PFUser.current()!.username)) signed up")
                             
-                            self.performSegueWithIdentifier("loginToMessage", sender: self)
+                            self.performSegue(withIdentifier: "loginToMessage", sender: self)
                             
                         } else {
-                            if let errorString = signupError!.userInfo["error"] as? NSString {
+                            if signupError != nil {
                                 
-                                error = errorString as String
+                                error = signupError as! String
                                 
                             } else {
                                 
@@ -132,7 +132,7 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
     
         }
     
-       var pickerDataSource = ["Alltel", "AT&T", "Boost", "Cricket", "Metro PCS", "O2", "Orange", "Pinger", "Rogers", "Sprint PCS", "T-Mobile", "Text Free", "US Cellular", "Verizon", "Virgin", "Quest"]
+       var pickerDataSource = ["Alltel", "AT&T", "Boost", "Cricket", "Metro PCS", "O2", "Orange", "Republic", "Rogers", "Sprint PCS", "T-Mobile", "US Cellular", "Verizon", "Virgin", "Quest"]
         
         override func viewDidLoad() {
             super.viewDidLoad()
@@ -142,20 +142,20 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
             self.carrierPicker.delegate = self
         }
     
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return pickerDataSource.count
     }
     
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         
         return pickerDataSource[row]
     }
     
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         
         self.namePicked = pickerDataSource[row]
         print(pickerDataSource[row])
@@ -199,11 +199,13 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
     carrierSMS = "@orange.net"
     carrierMMS = "@orange.net"
     }
-    if (self.namePicked == "Pinger"){
-    
-    carrierSMS = "@mobile.pinger.com"
-    carrierMMS = "@mobile.pinger.com"
+   
+    if (self.namePicked == "Republic"){
+            
+        carrierSMS = "@text.republicwireless.com"
+        carrierMMS = "@text.republicwireless.com"
     }
+        
     if (self.namePicked == "Rogers"){
     
     carrierSMS = "@sms.rogers.com"
@@ -219,11 +221,7 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
     carrierSMS = "@tmomail.net"
     carrierMMS = "@tmomail.net"
     }
-    if (self.namePicked == "Text Free"){
-    
-    carrierSMS = "@textfree.us"
-    carrierMMS = "@textfree.us"
-    }
+   
     if (self.namePicked == "US Cellular"){
             
         carrierSMS = "@email.uscc.net"
@@ -259,35 +257,35 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
             // Dispose of any resources that can be recreated.
         }
     
-        override func viewDidAppear(animated: Bool) {
+        override func viewDidAppear(_ animated: Bool) {
             
-            if PFUser.currentUser() != nil {
+            if PFUser.current() != nil {
                 
-                userEmail = PFUser.currentUser()!.email!
+                userEmail = PFUser.current()!.email!
                 print(userEmail)
-                userText = PFUser.currentUser()!["mobilePhoneCarrier"]! as! String
+                userText = PFUser.current()!["mobilePhoneCarrier"]! as! String
                 print(userText)
-                self.performSegueWithIdentifier("loginToMessage", sender: self)
+                self.performSegue(withIdentifier: "loginToMessage", sender: self)
                 
             }
             
         }
         
-        override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
             self.view.endEditing(true)
         }
         
-        func textFieldShouldReturn(textField: UITextField) -> Bool {
+        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
             // username.resignFirstResponder()
             return true
         }
         
-        override func viewWillAppear(animated: Bool) {
-            self.navigationController?.navigationBarHidden = true
+        override func viewWillAppear(_ animated: Bool) {
+            self.navigationController?.isNavigationBarHidden = true
         }
         
-        override func viewWillDisappear(animated: Bool) {
-            self.navigationController?.navigationBarHidden = false
+        override func viewWillDisappear(_ animated: Bool) {
+            self.navigationController?.isNavigationBarHidden = false
         }
 
 }

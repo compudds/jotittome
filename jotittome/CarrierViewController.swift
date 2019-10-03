@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import WebKit
 
 var carrierSMS = String()
 var carrierMMS = String()
@@ -20,7 +21,24 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     
     @IBOutlet var pickedName: UITextField!
     
-    @IBAction func doneBnt(sender: UIButton) {
+    @IBOutlet var containerView: WKWebView!
+    
+    @IBAction func carrierLookup(_ sender: Any) {
+        
+        let url1 = "http://www.carrierlookup.com/index.php/api/lookup?key=d5498e618b4a65ffa2bec3f700c7b02c71ae7d99&number=" + clean
+ 
+        
+        let carrierLookupURL: URL = URL(string: url1)!
+        
+        let request: URLRequest = URLRequest(url: carrierLookupURL)
+        
+        print(carrierLookupURL)
+        
+        containerView!.load(request)
+        
+            }
+    
+    @IBAction func doneBnt(_ sender: UIButton) {
         
         if (self.namePicked == "Alltel"){
             
@@ -57,11 +75,13 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
             carrierSMS = "\(clean)" + "@orange.net"
             carrierMMS = "\(clean)" + "@orange.net"
         }
-        if (self.namePicked == "Pinger"){
+        
+        if (self.namePicked == "Republic"){
             
-            carrierSMS = "\(clean)" + "@mobile.pinger.com"
-            carrierMMS = "\(clean)" + "@mobile.pinger.com"
+            carrierSMS = "\(clean)" + "@text.republicwireless.com"
+            carrierMMS = "\(clean)" + "@text.republicwireless.com"
         }
+        
         if (self.namePicked == "Rogers"){
             
             carrierSMS = "\(clean)" + "@sms.rogers.com"
@@ -77,11 +97,7 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
             carrierSMS = "\(clean)" + "@tmomail.net"
             carrierMMS = "\(clean)" + "@tmomail.net"
         }
-        if (self.namePicked == "Text Free"){
-            
-            carrierSMS = "\(clean)" + "@textfree.us"
-            carrierMMS = "\(clean)" + "@textfree.us"
-        }
+        
         if (self.namePicked == "US Cellular"){
             
             carrierSMS = "\(clean)" + "@email.uscc.net"
@@ -109,12 +125,14 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         smsNumber = carrierSMS + "," + smsNumber
         mmsNumber = carrierMMS + "," + mmsNumber
         
-        self.performSegueWithIdentifier("carrierToText", sender: self)
+        //self.performSegue(withIdentifier: "carrierToText", sender: self)
+        
+        self.performSegue(withIdentifier: "carrierToMessages", sender: self)
     }
 
     @IBOutlet weak var pickerView: UIPickerView!
     
-    var pickerDataSource = ["Alltel", "AT&T", "Boost", "Cricket", "Metro PCS", "O2", "Orange", "Pinger", "Rogers", "Sprint PCS", "T-Mobile", "Text Free", "US Cellular", "Verizon", "Virgin", "Quest"]
+    var pickerDataSource = ["Alltel", "AT&T", "Boost", "Cricket", "Metro PCS", "O2", "Orange", "Republic", "Rogers", "Sprint PCS", "T-Mobile", "US Cellular", "Verizon", "Virgin", "Quest"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -123,20 +141,20 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         
     }
     
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return pickerDataSource.count
     }
     
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         
         return pickerDataSource[row]
     }
     
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         
         self.namePicked = pickerDataSource[row]
         print(pickerDataSource[row])

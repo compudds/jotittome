@@ -13,21 +13,21 @@ var num = String()
 var freq = String()
 var end = String()
 var recDate = NSNumber()
-var yesterday = NSDate()
+var yesterday = Date()
 
 
-class RecurrentViewController: UIViewController {
+class RecurrentViewController: UIViewController,UIPickerViewDelegate, UIPickerViewDataSource {
     
     @IBOutlet var freqPicker: UIPickerView!
     
-    @IBAction func back(sender: AnyObject) {
+    @IBAction func back(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("recurrentToMessage", sender: self)
+        self.performSegue(withIdentifier: "recurrentToMessage", sender: self)
     }
     
     @IBOutlet var endDate: UIDatePicker!
     
-    @IBAction func datePicked(sender: AnyObject) {
+    @IBAction func datePicked(_ sender: AnyObject) {
         
         datePickerChanged(endDate)
         
@@ -40,49 +40,49 @@ class RecurrentViewController: UIViewController {
         ["None","Days","Weeks","Months","Years"]
     ]
     
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return picker.count
     }
     
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return picker[component].count
     }
     
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return picker[component][row]
     }
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         updateLabel()
     }
     
     func updateLabel(){
         
-        if picker[0][freqPicker.selectedRowInComponent(0)] == "None" {
+        if picker[0][freqPicker.selectedRow(inComponent: 0)] == "None" {
             period = "0"
         }
-        if picker[0][freqPicker.selectedRowInComponent(0)] == "Every" {
+        if picker[0][freqPicker.selectedRow(inComponent: 0)] == "Every" {
             period = "1"
         }
-        if picker[0][freqPicker.selectedRowInComponent(0)] == "Every Other" {
+        if picker[0][freqPicker.selectedRow(inComponent: 0)] == "Every Other" {
             period = "2"
         }
         //period = picker[0][freqPicker.selectedRowInComponent(0)]
         
-        num = picker[1][freqPicker.selectedRowInComponent(1)]
+        num = picker[1][freqPicker.selectedRow(inComponent: 1)]
         
-        if picker[2][freqPicker.selectedRowInComponent(2)] == "None" {
+        if picker[2][freqPicker.selectedRow(inComponent: 2)] == "None" {
             freq = "0"
         }
-        if picker[2][freqPicker.selectedRowInComponent(2)] == "Days" {
+        if picker[2][freqPicker.selectedRow(inComponent: 2)] == "Days" {
             freq = "1"
         }
-        if picker[2][freqPicker.selectedRowInComponent(2)] == "Weeks" {
+        if picker[2][freqPicker.selectedRow(inComponent: 2)] == "Weeks" {
             freq = "7"
         }
-        if picker[2][freqPicker.selectedRowInComponent(2)] == "Months" {
+        if picker[2][freqPicker.selectedRow(inComponent: 2)] == "Months" {
             freq = "30.45"
         }
-        if picker[2][freqPicker.selectedRowInComponent(2)] == "Years" {
+        if picker[2][freqPicker.selectedRow(inComponent: 2)] == "Years" {
             freq = "365.24"
         }
         //freq = picker[2][freqPicker.selectedRowInComponent(2)]
@@ -90,14 +90,14 @@ class RecurrentViewController: UIViewController {
         print("\(period) \(num) \(freq) \(end)")
     }
 
-    func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView!) -> UIView
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView
     {
         let pickerLabel = UILabel()
-        pickerLabel.textColor = UIColor.blackColor()
+        pickerLabel.textColor = UIColor.black
         pickerLabel.text = picker[component][row]    //"\(period)" + "\(num)" + "\(freq)"
         //pickerLabel.font = UIFont(name: pickerLabel.font.fontName, size: 15)
         pickerLabel.font = UIFont(name: "Helvetica", size: 17.0) // In this use your custom font
-        pickerLabel.textAlignment = NSTextAlignment.Center
+        pickerLabel.textAlignment = NSTextAlignment.center
         return pickerLabel
     }
 
@@ -106,19 +106,19 @@ class RecurrentViewController: UIViewController {
         
     }
     
-    func datePickerChanged(endDate:UIDatePicker) {
+    func datePickerChanged(_ endDate:UIDatePicker) {
         
-        let dateFormatter = NSDateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        dateFormatter.stringFromDate(endDate.date)
+        dateFormatter.string(from: endDate.date)
         let newDate1 = endDate.date
-        let newDate = newDate1.dateByAddingTimeInterval(-1*24*60*60) //subtract a day from datepicker
-        end = dateFormatter.stringFromDate(newDate)
+        let newDate = newDate1.addingTimeInterval(-1*24*60*60) //subtract a day from datepicker
+        end = dateFormatter.string(from: newDate)
         print(end)
         
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         
         noInternetConnection()
     }
@@ -135,17 +135,17 @@ class RecurrentViewController: UIViewController {
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
-            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "Try Again?", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 self.noInternetConnection()
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
         }

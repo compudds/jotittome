@@ -10,9 +10,9 @@ import UIKit
 
 class EditFutureViewController: UIViewController, UIScrollViewDelegate {
 
-    @IBAction func cancel(sender: AnyObject) {
+    @IBAction func cancel(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("editFutureToFuture", sender: self)
+        self.performSegue(withIdentifier: "editFutureToFuture", sender: self)
     }
     
     @IBOutlet var scroll: UIScrollView!
@@ -29,59 +29,63 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
     
     @IBOutlet var sent: UITextField!
     
-    @IBAction func update(sender: AnyObject) {
+    @IBAction func update(_ sender: AnyObject) {
         
         print("Future RecurrentId: \(futureRecurrentId)")
         
         if (futureRecurrentId != "no") {
             
-            let alert = UIAlertController(title: "You are editing a recurrent reminder!", message: "Do you want to edit all recurrent reminders in this set or just this one?.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "All?", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "You are editing a recurrent reminder!", message: "Do you want to edit all recurrent reminders in this set or just this one?.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "All?", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
-                let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update3-ios.php")
-                let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-                let request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 10.0)
-                request.HTTPMethod = "POST"
+                alert.dismiss(animated: true, completion: nil)
+                let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update3-ios.php")
+                let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+                let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 10.0)
+                request.httpMethod = "POST"
                 
                 // set Content-Type in HTTP header
                 let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
                 let contentType = "multipart/form-data; boundary=" + boundaryConstant
-                NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
+                URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
                 
                 
                 // set data
                 let dataString = "name=submit&id=\(futureEditId)&message=\(self.message.text!)&date=\(self.date.text!)&time=\(self.time.text!)&email=\(self.email.text!)&text=\(self.text.text!)&sent=\(self.sent.text!)&recurrent=\(futureRecurrentId)&all=yes&show=yes"
                 
-                let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                request.HTTPBody = requestBodyData
+                let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
+                request.httpBody = requestBodyData
                 
-                // set content length
-                //NSURLProtocol.setProperty(requestBodyData!.length, forKey: "Content-Length", inRequest: request)
+                let session = URLSession.shared
                 
-                var response: NSURLResponse? = nil
-                //var error: NSError? = nil
-                let reply: NSData?
-                do {
-                    reply = try NSURLConnection.sendSynchronousRequest(request, returningResponse:&response)
-                } catch let error1 as NSError {
-                    print(error1)
-                    reply = nil
-                } catch {
-                    fatalError()
-                }
-                
-                let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-                print("API Response: \(results)")
-                
-                //print("message=\(futureReminders[indexPath.row])&datetime1=\(futureDate[indexPath.row])&id=\(futureDeleteId)&recurrent=\(futureRecurrentId)&all=yes&show=yes&fromemail=\(parseUser)")
-                
-                //tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-                
-                let alert = UIAlertController(title: "Update Completed.", message: "Your reminder has been updated.", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+                let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    if error == nil {
+                        
+                        print("Data: \(data!)")
+                        
+                        print("Response: \(response!)")
+                        
+                        let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
+                        
+                        print("API Response: \(String(describing: results!))")
+                        
+                        
+                    } else {
+                        
+                        print("Error: \(error!)")
+                        
+                    }
+                    
+                })
+                
+                
+                task.resume()
+                
+                let alert = UIAlertController(title: "Update Completed.", message: "Your reminder has been updated.", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                    
+                    alert.dismiss(animated: true, completion: nil)
                     futureEditEmail = ""
                     futureEditText = ""
                     futureEditId = ""
@@ -94,57 +98,62 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
                     
                 }))
                 
-                self.presentViewController(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
 
                 
                 
             }))
-            alert.addAction(UIAlertAction(title: "This one?", style: .Default, handler: { action in
+            alert.addAction(UIAlertAction(title: "This one?", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
-                let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update3-ios.php")
-                let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-                let request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
-                request.HTTPMethod = "POST"
+                alert.dismiss(animated: true, completion: nil)
+                let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update3-ios.php")
+                let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+                let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
+                request.httpMethod = "POST"
                 
                 // set Content-Type in HTTP header
                 let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
                 let contentType = "multipart/form-data; boundary=" + boundaryConstant
-                NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
+                URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
                 
                 
                 // set data
                let dataString = "name=submit&id=\(futureEditId)&message=\(self.message.text!)&date=\(self.date.text!)&time=\(self.time.text!)&email=\(self.email.text!)&text=\(self.text.text!)&sent=\(self.sent.text!)&recurrent=\(futureRecurrentId)&all=no&show=yes"
                 
                 
-                let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                request.HTTPBody = requestBodyData
+                let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
+                request.httpBody = requestBodyData
                 
-                // set content length
-                //NSURLProtocol.setProperty(requestBodyData.length, forKey: "Content-Length", inRequest: request)
+                let session = URLSession.shared
                 
-                var response: NSURLResponse? = nil
-                //var error: NSError? = nil
-                let reply: NSData?
-                do {
-                    reply = try NSURLConnection.sendSynchronousRequest(request, returningResponse:&response)
-                } catch let error1 as NSError {
-                    print(error1)
-                    reply = nil
-                } catch {
-                    fatalError()
-                }
-                
-                let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-                print("API Response: \(results)")
-                
-                //print("message=\(futureReminders[indexPath.row])&datetime1=\(futureDate[indexPath.row])&id=\(futureDeleteId)&recurrent=\(futureRecurrentId)&all=no&show=yes&fromemail=\(parseUser)")
-                
-                //tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-                let alert = UIAlertController(title: "Update Completed.", message: "Your reminder has been updated.", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+                let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    if error == nil {
+                        
+                        print("Data: \(data!)")
+                        
+                        print("Response: \(response!)")
+                        
+                        let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
+                        
+                        print("API Response: \(String(describing: results!))")
+                        
+                        
+                    } else {
+                        
+                        print("Error: \(error!)")
+                        
+                    }
+                    
+                })
+                
+                
+                task.resume()
+                
+                let alert = UIAlertController(title: "Update Completed.", message: "Your reminder has been updated.", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                    
+                    alert.dismiss(animated: true, completion: nil)
                     futureEditEmail = ""
                     futureEditText = ""
                     futureEditId = ""
@@ -157,63 +166,73 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
                     
                 }))
                 
-                self.presentViewController(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
                 
 
                 
                 
             }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { action in
+            alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
             
         } else {
             
             
-            let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update3-ios.php")
-            let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-            let request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
-            request.HTTPMethod = "POST"
+            let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update3-ios.php")
+            let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+            let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
+            request.httpMethod = "POST"
             
             // set Content-Type in HTTP header
             let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
             let contentType = "multipart/form-data; boundary=" + boundaryConstant
-            NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
+            URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
             
             
             // set data
             let dataString = "name=submit&id=\(futureEditId)&message=\(message.text!)&date=\(date.text!)&time=\(time.text!)&email=\(email.text!)&text=\(text.text!)&sent=\(sent.text!)&all=no"
             
-            let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-            request.HTTPBody = requestBodyData
+            let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
+            request.httpBody = requestBodyData
             
-            // set content length
-            //NSURLProtocol.setProperty(requestBodyData.length, forKey: "Content-Length", inRequest: request)
+            let session = URLSession.shared
             
-            var response: NSURLResponse? = nil
-            //var error: NSError? = nil
-            let reply: NSData?
-            do {
-                reply = try NSURLConnection.sendSynchronousRequest(request, returningResponse:&response)
-            } catch let error1 as NSError {
-                print(error1)
-                reply = nil
-            }
-            
-            let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-            print("API Response: \(results)")
-            
-            let alert = UIAlertController(title: "Update Completed.", message: "Your reminder has been updated.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+            let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                if error == nil {
+                    
+                    print("Data: \(data!)")
+                    
+                    print("Response: \(response!)")
+                    
+                    let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
+                    
+                    print("API Response: \(String(describing: results!))")
+                    
+                    
+                } else {
+                    
+                    print("Error: \(error!)")
+                    
+                }
+                
+            })
+            
+            
+            task.resume()
+            
+            let alert = UIAlertController(title: "Update Completed.", message: "Your reminder has been updated.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                
+                alert.dismiss(animated: true, completion: nil)
                 futureEditEmail = ""
                 futureEditText = ""
                 futureEditId = ""
@@ -225,7 +244,7 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
 
             
             
@@ -292,7 +311,7 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        scroll.contentSize.height = 800
+        scroll.contentSize.height = 900
         scroll.contentSize.width = 267
 
     }
@@ -303,7 +322,7 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
         
     }*/
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         
         noInternetConnection()
     }
@@ -328,18 +347,18 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
-            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "Try Again?", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 
                 self.noInternetConnection()
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
         }
@@ -351,7 +370,7 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         self.view.endEditing(true)
         

@@ -25,119 +25,11 @@ var favEmails1 = [String]()
 
 class EmailTableViewController: UITableViewController {
 
-    @IBAction func backButton(sender: AnyObject) {
+    @IBAction func backButton(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("emailToMessage", sender: self)
-        
-    }
-    
-    var addressBook: ABAddressBookRef?
-    
-    func extractABAddressBookRef(abRef: Unmanaged<ABAddressBookRef>!) -> ABAddressBookRef? {
-        if let ab = abRef {
-            return Unmanaged<NSObject>.fromOpaque(ab.toOpaque()).takeUnretainedValue()
-        }
-        return nil
-    }
-    
-    
-    func test() {
-        if (ABAddressBookGetAuthorizationStatus() == ABAuthorizationStatus.NotDetermined) {
-            print("Requesting access...")
-            var errorRef: Unmanaged<CFError>? = nil
-            addressBook = extractABAddressBookRef(ABAddressBookCreateWithOptions(nil, &errorRef))
-            
-            ABAddressBookRequestAccessWithCompletion(addressBook, { success, error in
-                if success {
-                    
-                    if emailArray == [] || contactName1 == []{
-                        
-                        self.getContactNames()
-                        
-                    }
-                    
-                } else {
-                    print("Error: \(error)")
-                }
-            })
-        }
-        else if (ABAddressBookGetAuthorizationStatus() == ABAuthorizationStatus.Denied || ABAddressBookGetAuthorizationStatus() == ABAuthorizationStatus.Restricted) {
-            print("Access denied.")
-        }
-        else if (ABAddressBookGetAuthorizationStatus() == ABAuthorizationStatus.Authorized) {
-            print("Access granted.")
-            self.getContactNames()
-            
-        }
+        self.performSegue(withIdentifier: "emailToMessage", sender: self)
         
     }
-    
-    func getContactNames() {
-        
-        var errorRef: Unmanaged<CFError>?
-        addressBook = extractABAddressBookRef(ABAddressBookCreateWithOptions(nil, &errorRef))
-        let contactList: NSArray = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue()
-        
-        print("Records in the array - \(contactList.count)")
-        
-        for record:ABRecordRef in contactList {
-            
-            if record as? NSObject == nil {
-                
-                print("Error in field! \(record)")
-                
-            } else {
-                
-                let contactPerson: ABRecordRef = record
-                
-                let contactName: String = ABRecordCopyCompositeName(contactPerson).takeRetainedValue() as String
-                
-                var firstName = ABRecordCopyValue(contactPerson, kABPersonFirstNameProperty).takeUnretainedValue() as! String
-                
-                var lastName = ABRecordCopyValue(contactPerson, kABPersonLastNameProperty).takeUnretainedValue() as! String
-        
-                if firstName == "" || lastName == "" {
-                    
-                    firstName = "Eric"
-                    lastName = "Cook"
-                    
-                }
-
-
-                
-                let emailProperty: ABMultiValueRef = ABRecordCopyValue(contactPerson, kABPersonEmailProperty).takeRetainedValue() as ABMultiValueRef
-                
-                if ABMultiValueGetCount(emailProperty) > 0 {
-                    
-                    let allEmailIDs: NSArray = ABMultiValueCopyArrayOfAllValues(emailProperty).takeUnretainedValue() as NSArray
-                    
-                    for email in allEmailIDs {
-                        
-                        count += 1
-                        
-                        let emailID = email as! String
-                        
-                        if (emailID != "") {
-                            
-                            emailID1 = "\(emailID), " + emailID1
-                            emailArray = [emailID] + emailArray
-                            contactName1 = [contactName] + contactName1
-                            print ("\(count). Name: \(contactName1) Email: \(emailID) \n")
-                            print("Array: \(emailArray) \n")
-                        
-                        }
-                        
-                    }
-                    
-                }
-                
-                }
-                
-           }
-            
-            
-        }
-
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -156,18 +48,17 @@ class EmailTableViewController: UITableViewController {
             //contactName1 = []
             following = []
             
-            activityIndicator = UIActivityIndicatorView(frame: CGRectMake(0, 0, 80, 80))
+            activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
             activityIndicator.center = self.view.center
             activityIndicator.hidesWhenStopped = true
-            activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
+            activityIndicator.style = UIActivityIndicatorView.Style.gray
             self.view.addSubview(activityIndicator)
             activityIndicator.startAnimating()
-            UIApplication.sharedApplication().beginIgnoringInteractionEvents()
+            UIApplication.shared.beginIgnoringInteractionEvents()
             
-            test()
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
 
             
@@ -176,17 +67,17 @@ class EmailTableViewController: UITableViewController {
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
-            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "Try Again?", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 self.noInternetConnection()
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
         }
@@ -202,86 +93,56 @@ class EmailTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Potentially incomplete method implementation.
         // Return the number of sections.
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
-        return emailArray.count
+        return countEmailAddresses
     }
 
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
      
         cell.textLabel?.numberOfLines = 0
         
-        cell.textLabel?.text = contactName1[indexPath.row] as String + " \n " + emailArray[indexPath.row] as String
+        cell.textLabel?.text = ema1[indexPath.row] as String
         
-        if following.count > indexPath.row {
+        /*if following.count > (indexPath as NSIndexPath).row {
             
-            if following[indexPath.row] == true {
+            if following[(indexPath as NSIndexPath).row] == true {
                 
-                cell.accessoryType = UITableViewCellAccessoryType.Checkmark
-                favEmails = [contactName1[indexPath.row] as String + " " + emailArray[indexPath.row] as String] + favEmails
-                favEmails1 = [emailArray[indexPath.row] as String] + favEmails1
+                cell.accessoryType = UITableViewCellAccessoryType.checkmark
+                favEmails = [contactName1[(indexPath as NSIndexPath).row] as String + " " + emailArray[(indexPath as NSIndexPath).row] as String] + favEmails
+                favEmails1 = [emailArray[(indexPath as NSIndexPath).row] as String] + favEmails1
             }
             
-        }
+        }*/
         
 
         return cell
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        //iPathEmail = [emails[indexPath.row]]
         
-        //iPathText = [texts[indexPath.row]]
+        let ema = ema1[indexPath.row] as String
         
-        let cell:UITableViewCell = tableView.cellForRowAtIndexPath(indexPath)!
+        print(ema)
         
-        if cell.accessoryType == UITableViewCellAccessoryType.Checkmark {
-            
-            cell.accessoryType = UITableViewCellAccessoryType.None
-            
-           /* var query = PFQuery(className:"followers")
-            query.whereKey("follower", equalTo:PFUser.currentUser().username)
-            query.whereKey("following", equalTo:cell.textLabel?.text)
-            query.findObjectsInBackgroundWithBlock {
-                (objects: [AnyObject]!, error: NSError!) -> Void in
-                if error == nil {
-                    
-                    for object in objects {
-                        
-                        object.deleteEventually()   //deleteInBackground()
-                        
-                    }
-                    println("\(PFUser.currentUser().username) unfollowing \(cell.textLabel?.text)")
-                } else {
-                    // Log details of the failure
-                    println(error)
-                }
-            }*/
-            
-        } else {
-            
-            cell.accessoryType = UITableViewCellAccessoryType.Checkmark
-            favEmails = [contactName1[indexPath.row] as String + " " + emailArray[indexPath.row] as String] + favEmails
-            favEmails1 = [emailArray[indexPath.row] as String] + favEmails1
-            /*var following = PFObject(className: "followers")
-            following["following"] = cell.textLabel?.text
-            following["follower"] = PFUser.currentUser().username
-            
-            following.save()
-            
-            println("\(PFUser.currentUser().username) is following \(cell.textLabel?.text)")*/
-            
-        }
+        emailAddressesSelected = ema + "," + emailAddressesSelected
+        
+        emailActive = 1
+        
+        self.performSegue(withIdentifier: "emailToMessage", sender: self)
+        
+        
         
     }
     

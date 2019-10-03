@@ -15,16 +15,16 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
     
     var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
     
-    func displayAlert(title:String, error:String) {
+    func displayAlert(_ title:String, error:String) {
         
-        let alert = UIAlertController(title: title, message: error, preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+        let alert = UIAlertController(title: title, message: error, preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
             
-            alert.dismissViewControllerAnimated(true, completion: nil)
+            alert.dismiss(animated: true, completion: nil)
             
         }))
         
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
         
     }
     
@@ -41,10 +41,10 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
     
     @IBOutlet var signUpToggleButton: UIButton!
     
-    @IBAction func create(sender: AnyObject) {
+    @IBAction func create(_ sender: AnyObject) {
         
         
-        self.performSegueWithIdentifier("loginToCreate", sender: self)
+        self.performSegue(withIdentifier: "loginToCreate", sender: self)
         
         
     }
@@ -52,35 +52,35 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
     
     @IBOutlet var emailPasswordReset: UITextField!
     
-    @IBAction func resetPassword(sender: AnyObject) {
+    @IBAction func resetPassword(_ sender: AnyObject) {
         
             self.emailPasswordReset.alpha = 1
-            self.loginButton.setTitle("Send", forState: .Normal)
+            self.loginButton.setTitle("Send", for: UIControl.State())
             self.password.alpha = 0
             self.username.alpha = 0
 
     }
     
     
-    @IBAction func loginn(sender: AnyObject) {
+    @IBAction func loginn(_ sender: AnyObject) {
         
         var error = ""
         
         
-        activityIndicator = UIActivityIndicatorView(frame: CGRectMake(0, 0, 50, 50))
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
+        activityIndicator.style = UIActivityIndicatorView.Style.gray
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
-        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
+        UIApplication.shared.beginIgnoringInteractionEvents()
         
         if self.emailPasswordReset.alpha == 0 {
         
         if username.text == "" || password.text == "" {
                 
                 self.activityIndicator.stopAnimating()
-                UIApplication.sharedApplication().endIgnoringInteractionEvents()
+                UIApplication.shared.endIgnoringInteractionEvents()
                 
                 error = "Please enter all fields."
                 
@@ -88,27 +88,27 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
                 
             } else {
                 
-                PFUser.logInWithUsernameInBackground(username.text!, password:password.text!) {
+                PFUser.logInWithUsername(inBackground: username.text!, password:password.text!) {
                     (user, signupError) -> Void in
                     
                     
                     self.activityIndicator.stopAnimating()
-                    UIApplication.sharedApplication().endIgnoringInteractionEvents()
+                    UIApplication.shared.endIgnoringInteractionEvents()
                     
                     if user != nil {
                         
-                        print("\(PFUser.currentUser()!.username) is logged in")
-                        userEmail = PFUser.currentUser()!.email! + ","
-                        userText = PFUser.currentUser()!["mobilePhoneCarrier"]! as! String + ","
+                        print("\(String(describing: PFUser.current()!.username)) is logged in")
+                        userEmail = PFUser.current()!.email! + ","
+                        userText = PFUser.current()!["mobilePhoneCarrier"]! as! String + ","
                         print(userText)
 
-                        self.performSegueWithIdentifier("loginToMessage", sender: self)
+                        self.performSegue(withIdentifier: "loginToMessage", sender: self)
                         
                     } else {
                         
-                        if let errorString = signupError!.userInfo["error"] as? NSString {
+                        if signupError != nil {
                             
-                            error = errorString as String
+                            error = signupError as! String
                             
                         } else {
                             
@@ -130,58 +130,58 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
         } else {
             
             print(self.emailPasswordReset.text!)
-            print(PFUser.currentUser()?.email!)
+            print(PFUser.current()?.email! as Any)
         
           if self.emailPasswordReset.text! != "" {
             
-            if (self.emailPasswordReset.text! == PFUser.currentUser()?.email! || PFUser.currentUser()?.email! == nil ) {
+            if (self.emailPasswordReset.text! == PFUser.current()?.email! || PFUser.current()?.email! == nil ) {
         
-               PFUser.requestPasswordResetForEmailInBackground(self.emailPasswordReset.text!)
+               PFUser.requestPasswordResetForEmail(inBackground: self.emailPasswordReset.text!)
                 
-                let alert = UIAlertController(title: "Password re-set has been sent", message: error, preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+                let alert = UIAlertController(title: "Password re-set has been sent", message: error, preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     
                 }))
                 
-                self.presentViewController(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
                 
             } else {
                 
-                let alert = UIAlertController(title: "Email address is incorrect, please try again.", message: error, preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+                let alert = UIAlertController(title: "Email address is incorrect, please try again.", message: error, preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     
                 }))
                 
-                self.presentViewController(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
             }
             
             self.activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
 
         
             self.emailPasswordReset.alpha = 0
             self.password.alpha = 1
             self.username.alpha = 1
-            self.loginButton.setTitle("Log In", forState: .Normal)
+            self.loginButton.setTitle("Log In", for: UIControl.State())
             
           } else {
             
             self.activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
 
             
-            let alert = UIAlertController(title: "Enter email address!", message: error, preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Enter email address!", message: error, preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
 
             
             
@@ -205,34 +205,34 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
         // Dispose of any resources that can be recreated.
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         
-        if PFUser.currentUser() != nil {
-            userEmail = PFUser.currentUser()!.email!
+        if PFUser.current() != nil {
+            userEmail = PFUser.current()!.email!
             print(userEmail)
-            userText = PFUser.currentUser()!["mobilePhoneCarrier"]! as! String
+            userText = PFUser.current()!["mobilePhoneCarrier"]! as! String
             print(userText)
-            self.performSegueWithIdentifier("loginToMessage", sender: self)
+            self.performSegue(withIdentifier: "loginToMessage", sender: self)
             
         }
         
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         // username.resignFirstResponder()
         return true
     }
     
-    override func viewWillAppear(animated: Bool) {
-        self.navigationController?.navigationBarHidden = true
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = true
     }
     
-    override func viewWillDisappear(animated: Bool) {
-        self.navigationController?.navigationBarHidden = false
+    override func viewWillDisappear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = false
     }
     
 }

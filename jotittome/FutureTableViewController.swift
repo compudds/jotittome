@@ -24,13 +24,13 @@ var futureEditSent1 = Bool()
 class FutureTableViewController: UITableViewController {
     
     
-    @IBAction func backToHome(sender: AnyObject) {
+    @IBAction func backToHome(_ sender: AnyObject) {
         
-        self.performSegueWithIdentifier("futureToMessages", sender: self)
+        self.performSegue(withIdentifier: "futureToMessages", sender: self)
     }
     
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!){
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!){
         
         print("id=\(futureEditId) message=\(futureEditReminders) date=\(futureEditDate) time=\(futureEditTime) email=\(futureEditEmail) text=\(futureEditText) sent=\(futureEditSent) show=yes fromemail=\(parseUser)")
         
@@ -47,22 +47,22 @@ class FutureTableViewController: UITableViewController {
         futureRecurrentId = ""
         futureDeleteId = ""
         
-        self.refreshControl!.addTarget(self, action: #selector(FutureTableViewController.refresh(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl!.addTarget(self, action: #selector(FutureTableViewController.refresh(_:)), for: UIControl.Event.valueChanged)
         
-        activityIndicator = UIActivityIndicatorView(frame: CGRectMake(0, 0, 80, 80))
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
+        activityIndicator.style = UIActivityIndicatorView.Style.gray
         self.view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
-        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
+        UIApplication.shared.beginIgnoringInteractionEvents()
         
         
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         
-        self.navigationController?.navigationBarHidden = true
+        self.navigationController?.isNavigationBarHidden = true
         noInternetConnection()
     }
     
@@ -74,22 +74,22 @@ class FutureTableViewController: UITableViewController {
     
     // MARK: - Table view data source
     
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Potentially incomplete method implementation.
         // Return the number of sections.
         return 1
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
         return futureReminders.count
     }
     
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) 
         
         cell.textLabel!.numberOfLines = 0
         
@@ -100,9 +100,9 @@ class FutureTableViewController: UITableViewController {
     }
     
     // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
-        if editingStyle == .Delete {
+        if editingStyle == .delete {
             // Delete the row from the data source
             
             futureDeleteId = futureId[indexPath.row]
@@ -110,8 +110,8 @@ class FutureTableViewController: UITableViewController {
             let query = PFQuery(className:"Reminders")
             query.whereKey("objectId", equalTo: futureDeleteId)
             query.limit = 500
-            query.findObjectsInBackgroundWithBlock {
-                (objects: [PFObject]?, error: NSError?) -> Void in
+            query.findObjectsInBackground (block: {
+                (objects, error) in
                 
                 if error == nil {
                     // The find succeeded.
@@ -150,188 +150,211 @@ class FutureTableViewController: UITableViewController {
                     
                 } else {
                     // Log details of the failure
-                    print("Error: \(error!) \(error!.userInfo)")
+                    print("Error: \(error!) ")
                 }
                 
                 self.tableView.reloadData()
                 
-            }
+            })
             print(futureRecurrentId)
             
             if (futureRecurrentId != "no") {
                 
-                let alert = UIAlertController(title: "You are deleting a recurrent reminder!", message: "Do you want to delete all recurrent reminders in this set or just this one?.", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "All?", style: .Default, handler: { action in
+                let alert = UIAlertController(title: "You are deleting a recurrent reminder!", message: "Do you want to delete all recurrent reminders in this set or just this one?.", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "All?", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
-                    let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update-ios.php")
-                    let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-                    let request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 10.0)
-                    request.HTTPMethod = "POST"
+                    alert.dismiss(animated: true, completion: nil)
+                    let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update-ios.php")
+                    let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+                    let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 10.0)
+                    request.httpMethod = "POST"
                     
                     // set Content-Type in HTTP header
                     let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
                     let contentType = "multipart/form-data; boundary=" + boundaryConstant
-                    NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
+                    URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
                     
                     
                     // set data
                     let dataString = "message=\(futureReminders[indexPath.row])&datetime1=\(futureDate[indexPath.row])&id=\(futureDeleteId)&recurrent=\(futureRecurrentId)&all=yes&show=no&sent=yes&fromemail=\(parseUser)"
                     
-                    let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                    request.HTTPBody = requestBodyData
+                    let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
+                    request.httpBody = requestBodyData
                     
-                    // set content length
-                    //NSURLProtocol.setProperty(requestBodyData.length, forKey: "Content-Length", inRequest: request)
+                    let session = URLSession.shared
                     
-                    var response: NSURLResponse? = nil
-                    //var error: NSError? = nil
-                    let reply: NSData?
-                    do {
-                        reply = try NSURLConnection.sendSynchronousRequest(request, returningResponse:&response)
-                    } catch let error1 as NSError {
-                        print(error1)
-                        reply = nil
-                    } catch {
-                        fatalError()
-                    }
+                    let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
+                        
+                        if error == nil {
+                            
+                            print("Data: \(data!)")
+                            
+                            print("Response: \(response!)")
+                            
+                            let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
+                            
+                            print("API Response: \(String(describing: results!))")
+                            
+                            
+                        } else {
+                            
+                            print("Error: \(error!)")
+                            
+                        }
+                        
+                    })
                     
-                    let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-                    print("API Response: \(results)")
+                    
+                    task.resume()
                     
                     print("message=\(futureReminders[indexPath.row])&datetime1=\(futureDate[indexPath.row])&id=\(futureDeleteId)&recurrent=\(futureRecurrentId)&all=yes&show=no&sent=yes&fromemail=\(parseUser)")
                     
                     //tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                     
-                    let alert = UIAlertController(title: "Entry Deleted", message: "Your entry has been deleted. It will be deleted from this list the next time you view this table.", preferredStyle: UIAlertControllerStyle.Alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+                    let alert = UIAlertController(title: "Entry Deleted", message: "Your entry has been deleted. It will be deleted from this list the next time you view this table.", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                         
-                        alert.dismissViewControllerAnimated(true, completion: nil)
+                        alert.dismiss(animated: true, completion: nil)
                         //self.performSegueWithIdentifier("pastToMessages", sender: self)
                         
                     }))
                     
-                    self.presentViewController(alert, animated: true, completion: nil)
+                    self.present(alert, animated: true, completion: nil)
                     
 
                     
                 }))
                 
-                alert.addAction(UIAlertAction(title: "This one?", style: .Default, handler: { action in
+                alert.addAction(UIAlertAction(title: "This one?", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
-                    let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update-ios.php")
-                    let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-                    let request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
-                    request.HTTPMethod = "POST"
+                    alert.dismiss(animated: true, completion: nil)
+                    let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update-ios.php")
+                    let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+                    let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
+                    request.httpMethod = "POST"
                     
                     // set Content-Type in HTTP header
                     let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
                     let contentType = "multipart/form-data; boundary=" + boundaryConstant
-                    NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
+                    URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
                     
                     
                     // set data
                     let dataString = "message=\(futureReminders[indexPath.row])&datetime1=\(futureDate[indexPath.row])&id=\(futureDeleteId)&recurrent=\(futureRecurrentId)&all=no&show=no&sent=yes&fromemail=\(parseUser)"
                     
-                    let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                    request.HTTPBody = requestBodyData
+                    let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
+                    request.httpBody = requestBodyData
                     
-                    // set content length
-                    //NSURLProtocol.setProperty(requestBodyData.length, forKey: "Content-Length", inRequest: request)
+                    let session = URLSession.shared
                     
-                    var response: NSURLResponse? = nil
-                    //var error: NSError? = nil
-                    let reply: NSData?
-                    do {
-                        reply = try NSURLConnection.sendSynchronousRequest(request, returningResponse:&response)
-                    } catch let error1 as NSError {
-                        print(error1)
-                        reply = nil
-                    } catch {
-                        fatalError()
-                    }
+                    let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
+                        
+                        if error == nil {
+                            
+                            print("Data: \(data!)")
+                            
+                            print("Response: \(response!)")
+                            
+                            let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
+                            
+                            print("API Response: \(String(describing: results!))")
+                            
+                            
+                        } else {
+                            
+                            print("Error: \(error!)")
+                            
+                        }
+                        
+                    })
                     
-                    let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-                    print("API Response: \(results)")
                     
+                    task.resume()
                     print("message=\(futureReminders[indexPath.row])&datetime1=\(futureDate[indexPath.row])&id=\(futureDeleteId)&recurrent=\(futureRecurrentId)&all=no&show=no&sent=yes&fromemail=\(parseUser)")
                     
                     //tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                     
-                    let alert = UIAlertController(title: "Entry Deleted", message: "Your entry has been deleted. It will be deleted from this list the next time you view this table.", preferredStyle: UIAlertControllerStyle.Alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+                    let alert = UIAlertController(title: "Entry Deleted", message: "Your entry has been deleted. It will be deleted from this list the next time you view this table.", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                         
-                        alert.dismissViewControllerAnimated(true, completion: nil)
+                        alert.dismiss(animated: true, completion: nil)
                         //self.performSegueWithIdentifier("pastToMessages", sender: self)
                         
                     }))
                     
-                    self.presentViewController(alert, animated: true, completion: nil)
+                    self.present(alert, animated: true, completion: nil)
                     
 
                     
                     
                 }))
-                alert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { action in
+                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     
                     
                 }))
                 
-                self.presentViewController(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
                 
                 
                 
             } else {
                 
             
-            let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update-ios.php")
-            let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-            let request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
-            request.HTTPMethod = "POST"
+            let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update-ios.php")
+            let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+            let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
+            request.httpMethod = "POST"
             
             // set Content-Type in HTTP header
             let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
             let contentType = "multipart/form-data; boundary=" + boundaryConstant
-            NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
+            URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
             
             
             // set data
             let dataString = "message=\(futureReminders[indexPath.row])&datetime1=\(futureDate[indexPath.row])&id=\(futureDeleteId)&recurrent=\(futureRecurrentId)&all=no&show=no&sent=yes&fromemail=\(parseUser)"
             
-            let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-            request.HTTPBody = requestBodyData
-            
-            // set content length
-            //NSURLProtocol.setProperty(requestBodyData.length, forKey: "Content-Length", inRequest: request)
-            
-            var response: NSURLResponse? = nil
-            //var error: NSError? = nil
-            let reply: NSData?
-            do {
-                reply = try NSURLConnection.sendSynchronousRequest(request, returningResponse:&response)
-            } catch let error1 as NSError {
-                print(error1)
-                reply = nil
-            }
-            
-            let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-            print("API Response: \(results)")
-            
+            let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
+            request.httpBody = requestBodyData
+                
+                let session = URLSession.shared
+                
+                let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
+                    
+                    if error == nil {
+                        
+                        print("Data: \(data!)")
+                        
+                        print("Response: \(response!)")
+                        
+                        let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
+                        
+                        print("API Response: \(String(describing: results!))")
+                        
+                        
+                    } else {
+                        
+                        print("Error: \(error!)")
+                        
+                    }
+                    
+                })
+                
+                
+                task.resume()
             print("message=\(futureReminders[indexPath.row])&datetime1=\(futureDate[indexPath.row])&id=\(futureDeleteId)&recurrent=\(futureRecurrentId)&all=no&show=no&sent=yes&fromemail=\(parseUser)")
             
-            //tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-                let alert = UIAlertController(title: "Entry Deleted", message: "Your entry has been deleted.", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
+                let alert = UIAlertController(title: "Entry Deleted", message: "Your entry has been deleted.", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
                     
-                    alert.dismissViewControllerAnimated(true, completion: nil)
+                    alert.dismiss(animated: true, completion: nil)
                     //self.performSegueWithIdentifier("pastToMessages", sender: self)
                     
                 }))
                 
-                self.presentViewController(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
                 
                 futureReminders = []
                 futureRecurrentId = ""
@@ -349,7 +372,7 @@ class FutureTableViewController: UITableViewController {
     
     }
     
-    func refresh(sender:AnyObject) {
+    @objc func refresh(_ sender:AnyObject) {
         
         // Updating your data here...
         //self.refreshControl!.endRefreshing()
@@ -372,15 +395,15 @@ class FutureTableViewController: UITableViewController {
         
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     
         futureEditId = futureId[indexPath.row]
     
         let query = PFQuery(className:"Reminders")
         query.whereKey("objectId", equalTo: futureEditId)
         print("futureId: \(futureId[indexPath.row])")
-        query.findObjectsInBackgroundWithBlock {
-            (objects: [PFObject]?, error: NSError?) -> Void in
+        query.findObjectsInBackground (block: {
+            (objects, error) in
             
             if error == nil {
                 // The find succeeded.
@@ -416,31 +439,31 @@ class FutureTableViewController: UITableViewController {
                
             } else {
                 // Log details of the failure
-                print("Error: \(error!) \(error!.userInfo)")
+                print("Error: \(error!) ")
             }
             
             //self.tableView.reloadData()
-        }
+        })
         
-       self.performSegueWithIdentifier("futureToEditFuture", sender: self)
+       self.performSegue(withIdentifier: "futureToEditFuture", sender: self)
     
     }
     
     func getFutureReminders() {
         
-        let currentDate = NSDate()
-        let dateFormat = NSDateFormatter()
+        let currentDate = Date()
+        let dateFormat = DateFormatter()
         dateFormat.dateFormat = "yyyy-MM-dd"
-        let formatCurrentDate = dateFormat.stringFromDate(currentDate)
+        let formatCurrentDate = dateFormat.string(from: currentDate)
         //println(formatCurrentDate)
         let query = PFQuery(className:"Reminders")
-        query.whereKey("fromemail", equalTo: PFUser.currentUser()!.email!)
+        query.whereKey("fromemail", equalTo: PFUser.current()!.email!)
         query.whereKey("date1", greaterThan: formatCurrentDate)
         query.whereKey("show1", equalTo: true)
-        query.orderByAscending("date1")
+        query.order(byAscending: "date1")
         query.limit = 500
-        query.findObjectsInBackgroundWithBlock {
-            (objects: [PFObject]?, error: NSError?) -> Void in
+        query.findObjectsInBackground (block: {
+            (objects, error) in
             
             if error == nil {
                 // The find succeeded.
@@ -468,10 +491,10 @@ class FutureTableViewController: UITableViewController {
                 }
             } else {
                 // Log details of the failure
-                print("Error: \(error!) \(error!.userInfo)")
+                print("Error: \(error!) ")
             }
             self.tableView.reloadData()
-        }
+        })
         
     }
       
@@ -484,7 +507,7 @@ class FutureTableViewController: UITableViewController {
             print(userEmail)
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
             futureId = []
             futureReminders = []
@@ -498,17 +521,17 @@ class FutureTableViewController: UITableViewController {
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            UIApplication.shared.endIgnoringInteractionEvents()
             
-            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "Try Again?", style: .Default, handler: { action in
+            let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
                 
-                alert.dismissViewControllerAnimated(true, completion: nil)
+                alert.dismiss(animated: true, completion: nil)
                 self.noInternetConnection()
                 
             }))
             
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.present(alert, animated: true, completion: nil)
             
             
         }
