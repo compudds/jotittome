@@ -135,7 +135,8 @@ class EditTodayViewController: UIViewController, UIScrollViewDelegate {
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
+            //UIApplication.shared.endIgnoringInteractionEvents()
             
             let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in

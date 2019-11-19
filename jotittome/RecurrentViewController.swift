@@ -25,7 +25,7 @@ class RecurrentViewController: UIViewController,UIPickerViewDelegate, UIPickerVi
         self.performSegue(withIdentifier: "recurrentToMessage", sender: self)
     }
     
-    @IBOutlet var endDate: UIDatePicker!
+    @IBOutlet var endDate: UIDatePicker! //Change end date YEAR on storyboard
     
     @IBAction func datePicked(_ sender: AnyObject) {
         
@@ -95,8 +95,7 @@ class RecurrentViewController: UIViewController,UIPickerViewDelegate, UIPickerVi
         let pickerLabel = UILabel()
         pickerLabel.textColor = UIColor.black
         pickerLabel.text = picker[component][row]    //"\(period)" + "\(num)" + "\(freq)"
-        //pickerLabel.font = UIFont(name: pickerLabel.font.fontName, size: 15)
-        pickerLabel.font = UIFont(name: "Helvetica", size: 17.0) // In this use your custom font
+        pickerLabel.font = UIFont(name: "Helvetica", size: 17.0)
         pickerLabel.textAlignment = NSTextAlignment.center
         return pickerLabel
     }
@@ -135,7 +134,7 @@ class RecurrentViewController: UIViewController,UIPickerViewDelegate, UIPickerVi
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
             
             let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
@@ -159,15 +158,5 @@ class RecurrentViewController: UIViewController,UIPickerViewDelegate, UIPickerVi
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

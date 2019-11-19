@@ -229,111 +229,7 @@ class ViewController: UIViewController, UIScrollViewDelegate {
         }
     }
     
-    /*func alertForMultipleEmails(address: String) {
-        
-        print(ema1.count)
-        print(ema1)
-        
-        if countEmailAddresses > 1 {
-            
-            if ema1 != [] {
-                
-                
-            //for i in 0..<ema1.count {
-            //for address in ema1 {
-                
-                //let alert = UIAlertController(title: "Multiple emails exist for this contact.", message: "Did you want this one? \r\r \(ema1[i])", preferredStyle: UIAlertControllerStyle.alert)
-                
-                print(address)
-                
-                let alert = UIAlertController(title: "Multiple emails exist for this contact.", message: "Did you want this one? \r \(address)", preferredStyle: UIAlertControllerStyle.alert)
-                
-                alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
-                    
-                    alert.dismiss(animated: true, completion: nil)
-                    
-                    emailActive = 1
-                    
-                    //emailAddressesSelected = ema1[i] + "," + emailAddressesSelected
-                    
-                    emailAddressesSelected = address + "," + emailAddressesSelected
-                    
-                    self.to.text = smsNumber + emailAddressesSelected
-                    
-                    //self.performSegue(withIdentifier: "backToHome", sender: self)
-                    
-                    ema1 = []
-                    
-                }))
-                
-                
-                alert.addAction(UIAlertAction(title: "No", style: .default, handler: { action in
-                    
-                    alert.dismiss(animated: true, completion: nil)
-                    //self.performSegue(withIdentifier: "backToHome", sender: self)
-                    print(ema1)
-                    
-                    if emailAddressesSelected == "" {
-                        
-                        emailActive = 0
-                        
-                        self.sendEmailBtn.tintColor = UIColor.blue
-                        
-                    }
-                    
-                    ema1 = []
-                    
-                    
-                }))
-                
-                self.present(alert, animated: true, completion: nil)
-                
-                
-              //}
-                
-            }
-            
-        }
-        
-    }*/
-    
-
-    
-    /*@IBAction func emailContacts(sender: AnyObject) {
-        
-        message = messageText.text
-        println("Message: \(message)")
-        
-        activityIndicator = UIActivityIndicatorView(frame: CGRectMake(0, 0, 80, 80))
-        activityIndicator.center = self.view.center
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
-        self.view.addSubview(activityIndicator)
-        activityIndicator.startAnimating()
-        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-        
-        
-        self.performSegueWithIdentifier("messageToEmail", sender: self)
-        
-    }
-    
-    @IBAction func textContacts(sender: AnyObject) {
-        
-        message = messageText.text
-        println("Message: \(message)")
-        
-        activityIndicator = UIActivityIndicatorView(frame: CGRectMake(0, 0, 80, 80))
-        activityIndicator.center = self.view.center
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
-        self.view.addSubview(activityIndicator)
-        activityIndicator.startAnimating()
-        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-        
-        
-        self.performSegueWithIdentifier("homeToTexts", sender: self)
-        
-    }*/
+   
     @IBOutlet var recurrentBtn: UIButton!
     
     @IBAction func recurrent(_ sender: AnyObject) {
@@ -417,141 +313,135 @@ class ViewController: UIViewController, UIScrollViewDelegate {
                 self.present(alert, animated: true, completion: nil)
                 
             } else {
-            
-            schedDateTime.datePickerMode = UIDatePicker.Mode.date
-            let dateFormatter1 = DateFormatter()
-            dateFormatter1.dateFormat = "yyyy-MM-dd"
-            selectedDate = dateFormatter1.string(from: schedDateTime.date)
-            print("Date: \(selectedDate)")
-            
-            schedDateTime.datePickerMode = UIDatePicker.Mode.time
-            let pickerTime = schedDateTime.date
-            let time = pickerTime.addingTimeInterval(-60)
-            let timeFormatter = DateFormatter()
-            timeFormatter.dateFormat = "HH:mm:ss"
-            //selectedTime = timeFormatter.stringFromDate(schedDateTime.date)
-            selectedTime = timeFormatter.string(from: time)
-            print("Time: \(selectedTime)")
-            
-        
-        let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/written6.php")
-        let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
-        let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 8.0)
-        request.httpMethod = "POST"
-        
-        // set Content-Type in HTTP header
-        let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
-        let contentType = "multipart/form-data; boundary=" + boundaryConstant
-        URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
-        
-            if to.text == emailAddressesSelected + smsNumber || to.text == smsNumber + emailAddressesSelected {
                 
-               
-            } else {
-                
-                print(to.text!)
-                print(smsNumber + emailAddressesSelected)
-                print(emailAddressesSelected + smsNumber)
-                emailAddressesSelected = to.text!
-                smsNumber = ""
-                
-            }
-                
-        // set data
-        let dataString = "send1=\(messageText.text!)&date1=\(selectedDate)&date2=\(selectedTime)&email1=\(emailAddressesSelected)&text=\(smsNumber)&timezone=\(selectedDate) \(selectedTime)&ltzName=\(ltzName)&userEmail=\(parseUser)&userText=\(parseUserText)&period=\(period)&recDay=\(num)&frequency=\(freq)&endDate=\(end)"
-       
-        let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
-        request.httpBody = requestBodyData
-                
-                let session = URLSession.shared
-                
-                let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
-                    
-                    if error == nil {
+                    if (to.text!.last?.isNumber == true || to.text!.dropLast().last?.isNumber == true) {
                         
-                        print("Data: \(data!)")
+                        let alert = UIAlertController(title: "Error!", message: "You need to pick a cell phone carrier to send texts. To format correctly please go to \"Send Text\", pick a text number and pick a cell carrier. If your \"Default Text\" does not have a carrier attached to the text number please update it in \"Settings\".", preferredStyle: UIAlertController.Style.alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                            
+                            alert.dismiss(animated: true, completion: nil)
+                            
+                        }))
                         
-                        print("Response: \(response!)")
-                        
-                        let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
-                        
-                        print("API Response: \(String(describing: results!))")
+                        self.present(alert, animated: true, completion: nil)
                         
                         
                     } else {
                         
-                        print("Error: \(error!)")
+                        schedDateTime.datePickerMode = UIDatePicker.Mode.date
+                             let dateFormatter1 = DateFormatter()
+                             dateFormatter1.dateFormat = "yyyy-MM-dd"
+                             selectedDate = dateFormatter1.string(from: schedDateTime.date)
+                             print("Date: \(selectedDate)")
+                             
+                             schedDateTime.datePickerMode = UIDatePicker.Mode.time
+                             let pickerTime = schedDateTime.date
+                             let time = pickerTime.addingTimeInterval(-60)
+                             let timeFormatter = DateFormatter()
+                             timeFormatter.dateFormat = "HH:mm:ss"
+                             //selectedTime = timeFormatter.stringFromDate(schedDateTime.date)
+                             selectedTime = timeFormatter.string(from: time)
+                             print("Time: \(selectedTime)")
+                             
+                         
+                         let url = URL(string:"http://www.bettersearchllc.com/Sites/Jot-it/written6.php")
+                         let cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+                         let request = NSMutableURLRequest(url: url!, cachePolicy: cachePolicy, timeoutInterval: 8.0)
+                         request.httpMethod = "POST"
+                         
+                         // set Content-Type in HTTP header
+                         let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
+                         let contentType = "multipart/form-data; boundary=" + boundaryConstant
+                         URLProtocol.setProperty(contentType, forKey: "Content-Type", in: request)
+                         
+                             if to.text == emailAddressesSelected + smsNumber || to.text == smsNumber + emailAddressesSelected {
+                                 
+                                
+                             } else {
+                                 
+                                 print(to.text!)
+                                 print(smsNumber + emailAddressesSelected)
+                                 print(emailAddressesSelected + smsNumber)
+                                 emailAddressesSelected = to.text!
+                                 smsNumber = ""
+                                 
+                             }
+                                 
+                         // set data
+                         let dataString = "send1=\(messageText.text!)&date1=\(selectedDate)&date2=\(selectedTime)&email1=\(emailAddressesSelected)&text=\(smsNumber)&timezone=\(selectedDate) \(selectedTime)&ltzName=\(ltzName)&userEmail=\(parseUser)&userText=\(parseUserText)&period=\(period)&recDay=\(num)&frequency=\(freq)&endDate=\(end)"
                         
+                         let requestBodyData = (dataString as NSString).data(using: String.Encoding.utf8.rawValue)
+                         request.httpBody = requestBodyData
+                                 
+                                 let session = URLSession.shared
+                                 
+                                 let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, error -> Void in
+                                     
+                                     if error == nil {
+                                         
+                                         print("Data: \(data!)")
+                                         
+                                         print("Response: \(response!)")
+                                         
+                                         let results = NSString(data:data!, encoding:String.Encoding.utf8.rawValue)
+                                         
+                                         print("API Response: \(String(describing: results!))")
+                                         
+                                         
+                                     } else {
+                                         
+                                         print("Error: \(error!)")
+                                         
+                                     }
+                                     
+                                 })
+                                 
+                                 
+                                 task.resume()
+                         
+                          print("send1=\(messageText.text!)&date1=\(selectedDate)&date2=\(selectedTime)&email1=\(emailAddressesSelected)&text=\(smsNumber)&timezone=\(selectedDate) \(selectedTime)&ltzName=\(ltzName)&userEmail=\(parseUser)&period=\(period)&recDay=\(num)&frequency=\(freq)&endDate=\(end)")
+                        
+                         let alert = UIAlertController(title: "Your reminder was saved.", message: "Date: \(selectedDate) \r" + "Time: \(selectedTime) \r" + "Sent to: \(emailAddressesSelected) \(smsNumber) \r" + "Thank you!", preferredStyle: UIAlertController.Style.alert)
+                         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                             
+                             alert.dismiss(animated: true, completion: nil)
+                             
+                             
+                         }))
+                         
+                         self.present(alert, animated: true, completion: nil)
+                          
+                             smsNumber = ""
+                             mmsNumber = ""
+                             to.text = ""
+                             clean = ""
+                             message = ""
+                             emailAddressesSelected = ""
+                             selectedDate = ""
+                             selectedTime = ""
+                             messageText.text = ""
+                             period = ""
+                             num = ""
+                             freq = ""
+                             schedDateTime.datePickerMode = UIDatePicker.Mode.dateAndTime
+                             keyboardInactive()
+                             emailActive = 0
+                             textActive = 0
+                             defaultEmailActive = 0
+                             defaultTextActive = 0
+                             defaultColors()
+                             changeRecurrentBtnColor()
+                             btnColor = ""
+                             defaultEmailLabel.setTitleColor(UIColor.red, for: UIControl.State())
+                             defaultTextLabel.setTitleColor(UIColor.red, for: UIControl.State())
+                             self.sendEmailBtn.tintColor = self.view.tintColor
+                             self.sendTextBtn.tintColor = self.view.tintColor
+                             schedDateTime.date = Date()
+                             
                     }
-                    
-                })
-                
-                
-                task.resume()
-        
-        // set content length
+                   
+                }
             
-        //var response: URLResponse? = nil
-        
-        //var reply: Data?
-                
-        //do {
-            
-            
-            
-            //reply = try NSURLConnection.sendSynchronousRequest(request as URLRequest, returning:&response)
-                
-           //dataTaskWithRequest:completionHandler:]
-        /*} catch let error as NSError {
-            
-            print(error)
-            
-            reply = nil
-        }
-        
-        let results = NSString(data:reply!, encoding:String.Encoding.utf8.rawValue)
-        print("API Response: \(String(describing: results))")*/
-            
-        print("send1=\(messageText.text!)&date1=\(selectedDate)&date2=\(selectedTime)&email1=\(emailAddressesSelected)&text=\(smsNumber)&timezone=\(selectedDate) \(selectedTime)&ltzName=\(ltzName)&userEmail=\(parseUser)&period=\(period)&recDay=\(num)&frequency=\(freq)&endDate=\(end)")
-       
-        let alert = UIAlertController(title: "Your reminder was saved.", message: "Date: \(selectedDate) \r" + "Time: \(selectedTime) \r" + "Sent to: \(emailAddressesSelected) \(smsNumber) \r" + "Thank you!", preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-            
-            alert.dismiss(animated: true, completion: nil)
-            
-            
-        }))
-        
-        self.present(alert, animated: true, completion: nil)
-         
-            smsNumber = ""
-            mmsNumber = ""
-            to.text = ""
-            clean = ""
-            message = ""
-            emailAddressesSelected = ""
-            selectedDate = ""
-            selectedTime = ""
-            messageText.text = ""
-            period = ""
-            num = ""
-            freq = ""
-            schedDateTime.datePickerMode = UIDatePicker.Mode.dateAndTime
-            keyboardInactive()
-            emailActive = 0
-            textActive = 0
-            defaultEmailActive = 0
-            defaultTextActive = 0
-            defaultColors()
-            changeRecurrentBtnColor()
-            btnColor = ""
-            defaultEmailLabel.setTitleColor(UIColor.red, for: UIControl.State())
-            defaultTextLabel.setTitleColor(UIColor.red, for: UIControl.State())
-            self.sendEmailBtn.tintColor = self.view.tintColor
-            self.sendTextBtn.tintColor = self.view.tintColor
-            schedDateTime.date = Date()
-            
-                 }
             }
         }
         
@@ -664,7 +554,8 @@ class ViewController: UIViewController, UIScrollViewDelegate {
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
+            //UIApplication.shared.endIgnoringInteractionEvents()
             
             let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in

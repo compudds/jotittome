@@ -70,17 +70,21 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
         activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.style = UIActivityIndicatorView.Style.gray
+        if #available(iOS 13.0, *) {
+            activityIndicator.style = UIActivityIndicatorView.Style.medium
+        } else {
+            activityIndicator.style = UIActivityIndicatorView.Style.gray
+        }
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
-        UIApplication.shared.beginIgnoringInteractionEvents()
+        self.view.isUserInteractionEnabled = false
         
         if self.emailPasswordReset.alpha == 0 {
         
         if username.text == "" || password.text == "" {
                 
                 self.activityIndicator.stopAnimating()
-                UIApplication.shared.endIgnoringInteractionEvents()
+                self.view.isUserInteractionEnabled = true
                 
                 error = "Please enter all fields."
                 
@@ -93,7 +97,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
                     
                     
                     self.activityIndicator.stopAnimating()
-                    UIApplication.shared.endIgnoringInteractionEvents()
+                    self.view.isUserInteractionEnabled = true
                     
                     if user != nil {
                         
@@ -160,7 +164,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
             }
             
             self.activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
 
         
             self.emailPasswordReset.alpha = 0
@@ -171,7 +175,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
           } else {
             
             self.activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
 
             
             let alert = UIAlertController(title: "Enter email address!", message: error, preferredStyle: UIAlertController.Style.alert)

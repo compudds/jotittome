@@ -36,10 +36,14 @@ class PastTableViewController: UITableViewController {
         activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.style = UIActivityIndicatorView.Style.gray
+        if #available(iOS 13.0, *) {
+            activityIndicator.style = UIActivityIndicatorView.Style.medium
+        } else {
+            activityIndicator.style = UIActivityIndicatorView.Style.gray
+        }
         self.view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
-        UIApplication.shared.beginIgnoringInteractionEvents()
+        self.view.isUserInteractionEnabled = false
         
         
     }
@@ -148,7 +152,7 @@ class PastTableViewController: UITableViewController {
             print(userEmail)
             
             activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
             
             pastId = []
             pastReminders = []
@@ -163,7 +167,7 @@ class PastTableViewController: UITableViewController {
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
             
             let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
@@ -484,57 +488,6 @@ class PastTableViewController: UITableViewController {
             
             }
         
-        
-            /*let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update-ios.php")
-            let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-            var request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
-            request.HTTPMethod = "POST"
-            
-            // set Content-Type in HTTP header
-            let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
-            let contentType = "multipart/form-data; boundary=" + boundaryConstant
-            NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
-            
-           
-            // set data
-            var dataString = "message=\(pastReminders[indexPath.row])&datetime1=\(pastDate[indexPath.row])&show=yes&fromemail=\(parseUser)"
-            
-            let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-            request.HTTPBody = requestBodyData
-            
-            // set content length
-            //NSURLProtocol.setProperty(requestBodyData.length, forKey: "Content-Length", inRequest: request)
-            
-            var response: NSURLResponse? = nil
-            var error: NSError? = nil
-            let reply = NSURLConnection.sendSynchronousRequest(request, returningResponse:&response, error:&error)
-            
-            let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-            println("API Response: \(results)")
-            
-            println("message=\(pastReminders[indexPath.row])&datetime1=\(pastDate[indexPath.row])&show=yes&fromemail=\(parseUser)")
-            
-            //tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            
-            
-        }
-        
-        
-        self.tableView.reloadData()
-        
-        var alert = UIAlertController(title: "Entry Deleted", message: "Your entry has been deleted. It will be deleted from this list the next time you view this table.", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
-            
-            alert.dismissViewControllerAnimated(true, completion: nil)
-            //self.performSegueWithIdentifier("pastToMessages", sender: self)
-            
-        }))
-        
-        self.presentViewController(alert, animated: true, completion: nil)*/
-       
-        //self.performSegueWithIdentifier("pastToMessages", sender: self)
-        
-        
     }
     
     @objc func refresh(_ sender:AnyObject)
@@ -553,29 +506,5 @@ class PastTableViewController: UITableViewController {
         
     }
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

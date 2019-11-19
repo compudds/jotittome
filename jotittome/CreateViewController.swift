@@ -66,15 +66,19 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
                 activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
                 activityIndicator.center = self.view.center
                 activityIndicator.hidesWhenStopped = true
-                activityIndicator.style = UIActivityIndicatorView.Style.gray
+                if #available(iOS 13.0, *) {
+                    activityIndicator.style = UIActivityIndicatorView.Style.medium
+                } else {
+                    activityIndicator.style = UIActivityIndicatorView.Style.gray
+                }
                 view.addSubview(activityIndicator)
                 activityIndicator.startAnimating()
-                UIApplication.shared.beginIgnoringInteractionEvents()
+                self.view.isUserInteractionEnabled = false
                 
                 if username.text == "" || password.text == "" || emailaddress.text == "" || mobilePhone.text == "" || cellCarrier.text == ""{
                     
                     self.activityIndicator.stopAnimating()
-                    UIApplication.shared.endIgnoringInteractionEvents()
+                    self.view.isUserInteractionEnabled = true
                     
                     error = "Please enter all fields."
                     
@@ -82,50 +86,63 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
                     
                   } else {
                     
-                    let cleanNumber = mobilePhone.text
-                    clean = cleanNumber!.replacingOccurrences(of: "[a-zA-Z\\-\\*\\#\\@\\+\\(\\)\\.\" \"]", with: "", options: .regularExpression)
-                    
-                    print(clean)
-                    
-                    assignCarrier()
-                    
-                    let user = PFUser()
-                    user.username = username.text
-                    user.password = password.text
-                    user.email = emailaddress.text
-                    userEmail = emailaddress.text! + ","
-                    // other fields can be set just like with PFObject
-                    user["mobilePhone"] = clean
-                    user["carrier"] = cellCarrier.text
-                    user["mobilePhoneCarrier"] = clean + carrierSMS
-                    userText = clean + carrierSMS + ","
-                    user.signUpInBackground {
-                        (succeeded, signupError) in
+                    if cellCarrier.text == "" {
                         
-                        self.activityIndicator.stopAnimating()
-                        UIApplication.shared.endIgnoringInteractionEvents()
+                        error = "Please pick a cell phone carrier. All text numbers need a carrier attach to the number."
                         
-                        if signupError == nil  {
-                            // Hooray! Let them use the app now.
+                        displayAlert("Error: ", error: error)
+                        
+                    } else {
+                        
+                        let cleanNumber = mobilePhone.text
+                        clean = cleanNumber!.replacingOccurrences(of: "[a-zA-Z\\-\\*\\#\\@\\+\\(\\)\\.\" \"]", with: "", options: .regularExpression)
+                        
+                        print(clean)
+                        
+                        assignCarrier()
+                        
+                        let user = PFUser()
+                        user.username = username.text
+                        user.password = password.text
+                        user.email = emailaddress.text
+                        userEmail = emailaddress.text! + ","
+                        // other fields can be set just like with PFObject
+                        user["mobilePhone"] = clean
+                        user["carrier"] = cellCarrier.text
+                        user["mobilePhoneCarrier"] = clean + carrierSMS
+                        userText = clean + carrierSMS + ","
+                        user.signUpInBackground {
+                            (succeeded, signupError) in
                             
-                            print("\(String(describing: PFUser.current()!.username)) signed up")
+                            self.activityIndicator.stopAnimating()
+                            self.view.isUserInteractionEnabled = true
                             
-                            self.performSegue(withIdentifier: "loginToMessage", sender: self)
-                            
-                        } else {
-                            if signupError != nil {
+                            if signupError == nil  {
+                                // Hooray! Let them use the app now.
                                 
-                                error = signupError as! String
+                                print("\(String(describing: PFUser.current()!.username)) signed up")
+                                
+                                self.performSegue(withIdentifier: "loginToMessage", sender: self)
                                 
                             } else {
+                                if signupError != nil {
+                                    
+                                    error = signupError as! String
+                                    
+                                } else {
+                                    
+                                    error = "Please try again later."
+                                    
+                                }
                                 
-                                error = "Please try again later."
+                                self.displayAlert("Could Not Sign Up", error: error)
                                 
                             }
-                            
-                            self.displayAlert("Could Not Sign Up", error: error)
-                            
-                        }
+                        
+                        
+                    }
+                    
+                    
                     }
                     
                 }

@@ -50,15 +50,19 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
         activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
-        activityIndicator.style = UIActivityIndicatorView.Style.gray
+        if #available(iOS 13.0, *) {
+            activityIndicator.style = UIActivityIndicatorView.Style.medium
+        } else {
+            activityIndicator.style = UIActivityIndicatorView.Style.gray
+        }
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
-        UIApplication.shared.beginIgnoringInteractionEvents()
+        self.view.isUserInteractionEnabled = false
         
         if username.text == "" || emailaddress.text == "" || mobilePhone.text == "" || cellCarrier.text == ""{
             
             self.activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
             
             error = "Please enter all fields."
             
@@ -66,77 +70,89 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             
         } else {
             
-            let user = PFUser.current()
-            
-            if user != nil {
+            if cellCarrier.text == "" {
                 
-                user!.username = self.username.text
-                user!.email = self.emailaddress.text
-                userEmail = self.emailaddress.text! + ","
-                // other fields can be set just like with PFObject
-                let cleanNumber = mobilePhone.text
-                clean = cleanNumber!.replacingOccurrences(of: "[a-zA-Z\\-\\*\\#\\@\\+\\(\\)\\.\" \"]", with: "", options: .regularExpression)
+                error = "Please pick a cell phone carrier. All text numbers need a carrier attach to the number."
                 
-                print(clean)
-                
-                assignCarrier()
-                
-                user!["mobilePhone"]! = clean
-                user!["carrier"]! = self.cellCarrier.text as AnyObject
-                user!["mobilePhoneCarrier"]! = clean + carrierSMS
-                userText = clean + carrierSMS + ","
-                user!.saveEventually()
-                print(user!.username!)
-                print(user!.email!)
-                print(user!["mobilePhone"]!)
-                print(user!["carrier"]!)
-                print(user!["mobilePhoneCarrier"]!)
+                displayAlert("Error: ", error: error)
                 
             } else {
                 
-                self.activityIndicator.stopAnimating()
-                UIApplication.shared.endIgnoringInteractionEvents()
+                let user = PFUser.current()
+                    
+                    if user != nil {
+                        
+                        user!.username = self.username.text
+                        user!.email = self.emailaddress.text
+                        userEmail = self.emailaddress.text! + ","
+                        // other fields can be set just like with PFObject
+                        let cleanNumber = mobilePhone.text
+                        clean = cleanNumber!.replacingOccurrences(of: "[a-zA-Z\\-\\*\\#\\@\\+\\(\\)\\.\" \"]", with: "", options: .regularExpression)
+                        
+                        print(clean)
+                        
+                        assignCarrier()
+                        
+                        user!["mobilePhone"]! = clean
+                        user!["carrier"]! = self.cellCarrier.text as AnyObject
+                        user!["mobilePhoneCarrier"]! = clean + carrierSMS
+                        userText = clean + carrierSMS + ","
+                        user!.saveEventually()
+                        print(user!.username!)
+                        print(user!.email!)
+                        print(user!["mobilePhone"]!)
+                        print(user!["carrier"]!)
+                        print(user!["mobilePhoneCarrier"]!)
+                        
+                    } else {
+                        
+                        self.activityIndicator.stopAnimating()
+                        self.view.isUserInteractionEnabled = true
+                        
+                        let alert = UIAlertController(title: "Error Updating!", message: "Please log out and log back in, thentry updating again.", preferredStyle: UIAlertController.Style.alert)
+                        alert.addAction(UIAlertAction(title: "Log Out?", style: .default, handler: { action in
+                            
+                            alert.dismiss(animated: true, completion: nil)
+                            self.logOut()
+                            
+                        }))
+                        
+                        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
+                            
+                            alert.dismiss(animated: true, completion: nil)
+                            
+                            
+                        }))
+                        
+                        self.present(alert, animated: true, completion: nil)
+                        
+                    }
+                    
+                    //updateSettings.text = "Your settings have been saved."
+                    self.activityIndicator.stopAnimating()
+                    self.view.isUserInteractionEnabled = true
+                    
+                    let alert = UIAlertController(title: "Thank You!", message: "Your settings have been saved.", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                        
+                        alert.dismiss(animated: true, completion: nil)
+                        self.username.text = ""
+                        self.emailaddress.text = ""
+                        self.emailaddress.text = ""
+                        self.mobilePhone.text = ""
+                        self.cellCarrier.text = ""
+                        
+                    }))
+                    
+                    self.present(alert, animated: true, completion: nil)
+                    
+                    
+                }
                 
-                let alert = UIAlertController(title: "Error Updating!", message: "Please log out and log back in, thentry updating again.", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "Log Out?", style: .default, handler: { action in
-                    
-                    alert.dismiss(animated: true, completion: nil)
-                    self.logOut()
-                    
-                }))
-                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { action in
-                    
-                    alert.dismiss(animated: true, completion: nil)
-                    
-                    
-                }))
-                
-                self.present(alert, animated: true, completion: nil)
                 
             }
             
-            //updateSettings.text = "Your settings have been saved."
-            self.activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
             
-            let alert = UIAlertController(title: "Thank You!", message: "Your settings have been saved.", preferredStyle: UIAlertController.Style.alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-                
-                alert.dismiss(animated: true, completion: nil)
-                self.username.text = ""
-                self.emailaddress.text = ""
-                self.emailaddress.text = ""
-                self.mobilePhone.text = ""
-                self.cellCarrier.text = ""
-                
-            }))
-            
-            self.present(alert, animated: true, completion: nil)
-            
-            
-        }
-        
         
     }
     
@@ -399,7 +415,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             print(userEmail)
             
             activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
             
             
             
@@ -408,7 +424,7 @@ class SettingsViewController: UIViewController, MFMailComposeViewControllerDeleg
             print("Internet connection FAILED")
             
             activityIndicator.stopAnimating()
-            UIApplication.shared.endIgnoringInteractionEvents()
+            self.view.isUserInteractionEnabled = true
             
             let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
