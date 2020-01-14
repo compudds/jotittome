@@ -21,13 +21,16 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     
     @IBOutlet var pickedName: UITextField!
     
+    @IBOutlet var carrierTypeLabel: UILabel!
+    
+    //@IBOutlet var carrierNameLabel: UILabel!
+    
     @IBOutlet var containerView: WKWebView!
     
     @IBAction func carrierLookup(_ sender: Any) {
         
         let url1 = "http://www.carrierlookup.com/index.php/api/lookup?key=d5498e618b4a65ffa2bec3f700c7b02c71ae7d99&number=" + clean
  
-        
         let carrierLookupURL: URL = URL(string: url1)!
         
         let request: URLRequest = URLRequest(url: carrierLookupURL)
@@ -36,7 +39,35 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         
         containerView!.load(request)
         
+        let data = try? Data(contentsOf: URL(string: url1)!)
+        
+        let json = try? JSONSerialization.jsonObject(with: data!, options: [])
+        
+        if let objects = json as? [String: Any] {
+            
+            if let responses = objects["Response"] as? [String:Any] {
+                
+                if let carrierType = responses["carrier_type"] as? String {
+                    
+                   if let carrierName = responses["carrier"] as? String {
+                        
+                        if carrierType == "mobile" {
+                            
+                            carrierTypeLabel.text = "The phone number \(clean) is a \(carrierType.capitalized) phone, the carrier is \( carrierName.capitalized)."
+                        } else {
+                            
+                            carrierTypeLabel.text = "The phone number \(clean) is a \(carrierType.capitalized)."
+                        }
+                       
+                    }
+                        
+                }
+                
             }
+            
+        }
+        
+    }
     
     @IBAction func doneBnt(_ sender: UIButton) {
         
@@ -136,6 +167,9 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.navigationController?.isNavigationBarHidden = false
+        
         self.pickerView.dataSource = self
         self.pickerView.delegate = self
         

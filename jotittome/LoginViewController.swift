@@ -9,7 +9,6 @@
 import UIKit
 import Parse
 
-
 class LoginViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
     
@@ -60,7 +59,6 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UII
             self.username.alpha = 0
 
     }
-    
     
     @IBAction func loginn(_ sender: AnyObject) {
         

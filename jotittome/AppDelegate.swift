@@ -8,9 +8,6 @@
 
 import UIKit
 import Parse
-//import Bolts
-//import PushNotificationManager
-
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {  //, PushNotificationDelegate

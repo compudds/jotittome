@@ -9,6 +9,7 @@
 import UIKit
 import Parse
 
+
 var signupActive = Bool()
 var userEmail = String()
 var userText = String()
@@ -57,6 +58,7 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
             self.performSegue(withIdentifier: "createToLogin", sender: self)
         
         }
+    
         
         @IBAction func signUp(_ sender: AnyObject) {
             
@@ -306,4 +308,7 @@ class CreateViewController: UIViewController, UINavigationControllerDelegate, UI
         }
 
 }
+
+
+
 

@@ -151,39 +151,44 @@ class ViewController: UIViewController, UIScrollViewDelegate {
     
     @IBAction func clearAll(_ sender: AnyObject) {
       
-        smsNumber = ""
-        mmsNumber = ""
-        to.text = ""
-        clean = ""
-        message = ""
-        emailAddressesSelected = ""
-        selectedDate = ""
-        selectedTime = ""
-        messageText.text = ""
-        period = ""
-        num = ""
-        freq = ""
-        keyboardInactive()
-        emailActive = 0
-        textActive = 0
-        defaultEmailActive = 0
-        defaultTextActive = 0
-        btnColor = ""
-        defaultColors()
-        self.sendEmailBtn.tintColor = self.view.tintColor
-        self.sendTextBtn.tintColor = self.view.tintColor
-        defaultEmailLabel.setTitleColor(UIColor.red, for: UIControl.State())
-        defaultTextLabel.setTitleColor(UIColor.red, for: UIControl.State())
-        changeRecurrentBtnColor()
-        schedDateTime.date = Date()
-        ema1 = []
-        ema = ""
-        text1 = []
-        countTextNumbers = 0
-        countEmailAddresses = 0
-        
-        let alert = UIAlertController(title: "All fields are clear!", message: "Start entering your information again.", preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+        let alert = UIAlertController(title: "Clear all fields?", message: "", preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "Clear", style: .default, handler: { action in
+            
+            smsNumber = ""
+            mmsNumber = ""
+            self.to.text = ""
+            clean = ""
+            message = ""
+            emailAddressesSelected = ""
+            selectedDate = ""
+            selectedTime = ""
+            self.messageText.text = ""
+            period = ""
+            num = ""
+            freq = ""
+            self.keyboardInactive()
+            emailActive = 0
+            textActive = 0
+            defaultEmailActive = 0
+            defaultTextActive = 0
+            btnColor = ""
+            self.defaultColors()
+            self.sendEmailBtn.tintColor = self.view.tintColor
+            self.sendTextBtn.tintColor = self.view.tintColor
+            self.defaultEmailLabel.setTitleColor(UIColor.red, for: UIControl.State())
+            self.defaultTextLabel.setTitleColor(UIColor.red, for: UIControl.State())
+            self.changeRecurrentBtnColor()
+            self.schedDateTime.date = Date()
+            ema1 = []
+            ema = ""
+            text1 = []
+            countTextNumbers = 0
+            countEmailAddresses = 0
+            
+            alert.dismiss(animated: true, completion: nil)
+            
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
             
             alert.dismiss(animated: true, completion: nil)
             
