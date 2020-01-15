@@ -29,6 +29,11 @@ class CarrierViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     
     @IBAction func carrierLookup(_ sender: Any) {
         
+        if clean.first == "1" {
+            
+            clean = String(clean.dropFirst(1))
+        }
+        
         let url1 = "http://www.carrierlookup.com/index.php/api/lookup?key=d5498e618b4a65ffa2bec3f700c7b02c71ae7d99&number=" + clean
  
         let carrierLookupURL: URL = URL(string: url1)!
