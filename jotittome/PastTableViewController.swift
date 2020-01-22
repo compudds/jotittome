@@ -21,11 +21,10 @@ class PastTableViewController: UITableViewController {
         
         self.performSegue(withIdentifier: "pastToMessage", sender: self)
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
         pastReminders = []
         pastRecurrentId = ""
@@ -33,22 +32,18 @@ class PastTableViewController: UITableViewController {
         
         self.refreshControl!.addTarget(self, action: #selector(PastTableViewController.refresh(_:)), for: UIControl.Event.valueChanged)
         
-        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
-        activityIndicator.center = self.view.center
-        activityIndicator.hidesWhenStopped = true
-        if #available(iOS 13.0, *) {
-            activityIndicator.style = UIActivityIndicatorView.Style.medium
-        } else {
-            activityIndicator.style = UIActivityIndicatorView.Style.gray
-        }
-        self.view.addSubview(activityIndicator)
-        activityIndicator.startAnimating()
-        self.view.isUserInteractionEnabled = false
-        
         
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = UIActivityIndicatorView.Style.large
+        self.view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+        self.view.isUserInteractionEnabled = false
         
         self.navigationController?.isNavigationBarHidden = true
         
@@ -90,6 +85,7 @@ class PastTableViewController: UITableViewController {
                 // Log details of the failure
                 print("Error: \(error!) ")
             }
+            
             self.tableView.reloadData()
         })
         
@@ -105,14 +101,15 @@ class PastTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
+        
         return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
+        
+        activityIndicator.stopAnimating()
+        self.view.isUserInteractionEnabled = true
+        
         return pastReminders.count
     }
     
@@ -124,6 +121,9 @@ class PastTableViewController: UITableViewController {
         cell.textLabel!.numberOfLines = 0
         
         cell.textLabel!.text = "Message: " + pastReminders[(indexPath as NSIndexPath).row] + "\r" + "Delivery: " + pastDate[(indexPath as NSIndexPath).row]
+        
+        //activityIndicator.stopAnimating()
+        //self.view.isUserInteractionEnabled = true
         
         return cell
     }
@@ -150,9 +150,6 @@ class PastTableViewController: UITableViewController {
             print("Internet connection OK")
             
             print(userEmail)
-            
-            activityIndicator.stopAnimating()
-            self.view.isUserInteractionEnabled = true
             
             pastId = []
             pastReminders = []

@@ -249,63 +249,7 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
             
             
         }
-        
-        
-        
-        
-        /*
-        let url = NSURL(string:"http://www.bettersearchllc.com/Sites/Jot-it/update3-ios.php")
-        let cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-        let request = NSMutableURLRequest(URL: url!, cachePolicy: cachePolicy, timeoutInterval: 2.0)
-        request.HTTPMethod = "POST"
-        
-        // set Content-Type in HTTP header
-        let boundaryConstant = "----------V2ymHFg03fssfjfnkslirt9549uvnerfhbqgZCaKO6jy";
-        let contentType = "multipart/form-data; boundary=" + boundaryConstant
-        NSURLProtocol.setProperty(contentType, forKey: "Content-Type", inRequest: request)
-        
-        
-        // set data
-        let dataString = "name=submit&id=\(futureEditId)&message=\(message.text!)&date=\(date.text!)&time=\(time.text!)&email=\(email.text!)&text=\(text.text!)&sent=\(sent.text!)"
-        
-        let requestBodyData = (dataString as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-        request.HTTPBody = requestBodyData
-        
-        // set content length
-        //NSURLProtocol.setProperty(requestBodyData.length, forKey: "Content-Length", inRequest: request)
-        
-        var response: NSURLResponse? = nil
-        //var error: NSError? = nil
-        let reply: NSData?
-        do {
-            reply = try NSURLConnection.sendSynchronousRequest(request, returningResponse:&response)
-        } catch let error1 as NSError {
-            print(error1)
-            reply = nil
-        }
-        
-        let results = NSString(data:reply!, encoding:NSUTF8StringEncoding)
-        print("API Response: \(results)")
-        
-        let alert = UIAlertController(title: "Update Completed.", message: "Your reminder has been updated.", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { action in
-            
-            alert.dismissViewControllerAnimated(true, completion: nil)
-            futureEditEmail = ""
-            futureEditText = ""
-            futureEditId = ""
-            futureId = []
-            futureEditReminders = ""
-            futureEditDate = ""
-            futureEditTime = ""
-            futureEditSent = ""
-      
-        }))
-        
-        self.presentViewController(alert, animated: true, completion: nil)
-        
-      */
-        
+    
     }
     
     override func viewDidLoad() {
@@ -315,18 +259,6 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
         scroll.contentSize.width = 267
 
     }
-    
-    /*override func viewDidLayoutSubviews() {
-        
-        self.scroll.contentSize = CGSize(width: 260, height: 1500)
-        
-    }*/
-    
-    override func viewDidAppear(_ animated: Bool) {
-        
-        noInternetConnection()
-    }
-
     
     func noInternetConnection() {
         
@@ -340,14 +272,10 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
             sent.text = "\(futureEditSent)"
             
             print("id=\(futureEditId) message=\(futureEditReminders) date=\(futureEditDate) time=\(futureEditTime) email=\(futureEditEmail) text=\(futureEditText) sent=\(futureEditSent) show=yes fromemail=\(parseUser) futureRecurrentId: \(futureRecurrentId)")
-
             
         } else {
             
             print("Internet connection FAILED")
-            
-            activityIndicator.stopAnimating()
-            self.view.isUserInteractionEnabled = true
             
             let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
@@ -363,6 +291,24 @@ class EditFutureViewController: UIViewController, UIScrollViewDelegate {
             
         }
         
+        activityIndicator.stopAnimating()
+        self.view.isUserInteractionEnabled = true
+        
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = UIActivityIndicatorView.Style.large
+        self.view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+        self.view.isUserInteractionEnabled = false
+           
+        
+        noInternetConnection()
     }
 
     override func didReceiveMemoryWarning() {

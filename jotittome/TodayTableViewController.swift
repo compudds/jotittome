@@ -47,21 +47,18 @@ class TodayTableViewController: UITableViewController {
         
         self.refreshControl!.addTarget(self, action: #selector(TodayTableViewController.refresh(_:)), for: UIControl.Event.valueChanged)
         
-        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
-        activityIndicator.center = self.view.center
-        activityIndicator.hidesWhenStopped = true
-        if #available(iOS 13.0, *) {
-            activityIndicator.style = UIActivityIndicatorView.Style.medium
-        } else {
-            activityIndicator.style = UIActivityIndicatorView.Style.gray
-        }
-        self.view.addSubview(activityIndicator)
-        activityIndicator.startAnimating()
-        self.view.isUserInteractionEnabled = false
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = UIActivityIndicatorView.Style.large
+        self.view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+        self.view.isUserInteractionEnabled = false
+             
         
         self.navigationController?.isNavigationBarHidden = true
         
@@ -84,8 +81,10 @@ class TodayTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
+        
+        activityIndicator.stopAnimating()
+        self.view.isUserInteractionEnabled = true
+        
         return todayReminders.count
     }
     
@@ -99,7 +98,7 @@ class TodayTableViewController: UITableViewController {
         cell.textLabel!.text = "Message: " + todayReminders[indexPath.row] + "\r" + "Delivery: " + todayDate[indexPath.row] + " " + todayTime[indexPath.row]
         
         return cell
-       
+        
     }
     
     // Override to support editing the table view.
@@ -486,9 +485,6 @@ class TodayTableViewController: UITableViewController {
             print("Internet connection OK")
             
             print(userEmail)
-            
-            activityIndicator.stopAnimating()
-            self.view.isUserInteractionEnabled = true
             
             todayId = []
             todayReminders = []

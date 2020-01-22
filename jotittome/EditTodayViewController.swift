@@ -105,18 +105,6 @@ class EditTodayViewController: UIViewController, UIScrollViewDelegate {
     }
     
     
-    /*override func viewDidLayoutSubviews() {
-     
-        self.scroll.contentSize = CGSize(width: 257, height: 1000)
-        
-    }*/
-    
-    override func viewDidAppear(_ animated: Bool) {
-        
-       noInternetConnection()
-    }
-
-    
     func noInternetConnection() {
         
         if Reachability.isConnectedToNetwork() == true {
@@ -130,13 +118,10 @@ class EditTodayViewController: UIViewController, UIScrollViewDelegate {
             
             print("id=\(todayEditId) message=\(todayEditReminders) date=\(todayEditDate) time=\(todayEditTime) email=\(todayEditEmail) text=\(todayEditText) timezone=\(todayEditDate) \(todayEditTime) sent=\(todayEditSent) show=yes fromemail=\(parseUser)")
             
+            
         } else {
             
             print("Internet connection FAILED")
-            
-            activityIndicator.stopAnimating()
-            self.view.isUserInteractionEnabled = true
-            //UIApplication.shared.endIgnoringInteractionEvents()
             
             let alert = UIAlertController(title: "Sorry, no internet connection found.", message: "Jot-It To Me requires an internet connection.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Try Again?", style: .default, handler: { action in
@@ -152,6 +137,22 @@ class EditTodayViewController: UIViewController, UIScrollViewDelegate {
             
         }
         
+        activityIndicator.stopAnimating()
+        self.view.isUserInteractionEnabled = true
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = UIActivityIndicatorView.Style.large
+        self.view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+        self.view.isUserInteractionEnabled = false
+        
+       noInternetConnection()
     }
 
     override func didReceiveMemoryWarning() {

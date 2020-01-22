@@ -49,24 +49,21 @@ class FutureTableViewController: UITableViewController {
         
         self.refreshControl!.addTarget(self, action: #selector(FutureTableViewController.refresh(_:)), for: UIControl.Event.valueChanged)
         
-        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
-        activityIndicator.center = self.view.center
-        activityIndicator.hidesWhenStopped = true
-        if #available(iOS 13.0, *) {
-            activityIndicator.style = UIActivityIndicatorView.Style.medium
-        } else {
-            activityIndicator.style = UIActivityIndicatorView.Style.gray
-        }
-        self.view.addSubview(activityIndicator)
-        activityIndicator.startAnimating()
-        self.view.isUserInteractionEnabled = false
-        
         
     }
     
     override func viewDidAppear(_ animated: Bool) {
         
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = UIActivityIndicatorView.Style.large
+        self.view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+        self.view.isUserInteractionEnabled = false
+        
         self.navigationController?.isNavigationBarHidden = true
+       
         noInternetConnection()
     }
     
@@ -85,8 +82,10 @@ class FutureTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
+        
+        activityIndicator.stopAnimating()
+        self.view.isUserInteractionEnabled = true
+        
         return futureReminders.count
     }
     
@@ -98,7 +97,9 @@ class FutureTableViewController: UITableViewController {
         cell.textLabel!.numberOfLines = 0
         
         cell.textLabel!.text = "Message: " + futureReminders[indexPath.row] + "\r" + "Delivery: " + futureDate[indexPath.row] + " " + futureTime[indexPath.row]
-
+        
+        //activityIndicator.stopAnimating()
+        //self.view.isUserInteractionEnabled = true
         
         return cell
     }
@@ -497,6 +498,7 @@ class FutureTableViewController: UITableViewController {
                 // Log details of the failure
                 print("Error: \(error!) ")
             }
+            
             self.tableView.reloadData()
         })
         
@@ -509,9 +511,6 @@ class FutureTableViewController: UITableViewController {
             print("Internet connection OK")
             
             print(userEmail)
-            
-            activityIndicator.stopAnimating()
-            self.view.isUserInteractionEnabled = true
             
             futureId = []
             futureReminders = []
